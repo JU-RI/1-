@@ -1,0 +1,50 @@
+import pymysql
+
+con = None
+
+
+def friend_insert(friend_num, id):
+    con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "insert into friends values ('%s', '%s')" % (friend_num, id)
+    cur.execute(sql)
+    print("sql문 -> 전송 성공")
+    con.commit()
+    con.close()
+
+
+def friend_select(name):
+    con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = "facebook")
+    cur = con.cursor()
+    sql = "select * from members where name = '%s'" % name
+    cur.execute(sql)
+    
+    record = cur.fetchone()
+    print(record)
+    
+    print(record[0], record[1])
+    return record
+
+    con.commit()
+    con.close()
+    
+    
+    
+def friend_list():  #친구 목록 출력
+    con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "select * from friends"
+    cur.execute(sql)
+
+    result = []
+    
+    while True:
+        record = cur.fetchone()
+        if record == None:
+            break
+        else:
+            print(record)
+            result.append(record)
+    con.commit()
+    con.close()
+    return result
