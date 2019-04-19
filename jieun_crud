@@ -1,98 +1,365 @@
-from pymysql import *
+from tkinter import *
+from crud import *
+from tkinter import messagebox
+from tkinter.filedialog import *
+from tkinter.simpledialog import *
+# from idlelib.idle_test.mock_tk import Var
+from 친구검색ui import *
 
-# db처리는 따로 모듈 만듦. 이외에 컨트롤러 부분, 화면 뷰 구성 정도로 모듈 성격별로 나눌 수 있음
 
-def sign_up(id, pw, name, country, city, birthday, gender):
-    con = connect(host='localhost', user='root', password ='1234', db = 'facebook')
-    cur = con.cursor()
-    
-    sql = "insert into members values('%s','%s','%s','%s','%s','%s','%s','NULL', 'NULL')" % (id, pw, name, country, city, birthday, gender)
-    
-    cur.execute(sql)
-    con.commit()
-    con.close()
+id_input, pw_input, name_input, join_id_input, join_pw_input, gender_input, birthday_input, country_input, city_input, photo_label, hobby_input, pw2_input, filename, var, my_id = None,None,None,None,None,None,None,None,None,None,None,None,None,None,None
 
-def sign_in(id):
-    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
-    cur = con.cursor()
-    
-    sql = "select pw from members where id = '%s'" % id
-    
-    cur.execute(sql)
-    result = cur.fetchone()
-    con.close()
-    
-    return result
 
-def my_info_update(id, pw, name, country, city, birthday, gender, hobby, profile):
-    con = connect(host='localhost', user='root', password ='1234', db = 'facebook')
-    cur = con.cursor()
+def my_bulletin_ui(my_id):
+    pass
 
-    sql = """update members set pw = '%s', name = '%s', country = '%s', city = '%s', birthday = '%s', gender = '%s', 
-        hobby = '%s', profile = '%s' where id = '%s'""" % (pw, name, country, city, birthday, gender, hobby, profile, id)
+def sign_in_process():
+    id = id_input.get()
+    pw = pw_input.get()
     
-    cur.execute(sql)
-    con.commit()
-    con.close()
+    all_id = select_all_id() 
+    id_list = list() 
     
-    print("나의 정보 업데이트 완료!!")
+    for n in range(len(all_id)):
+        id_list.append(all_id[n][0])
+      
+    num = 0     
+    while True:                
+        if num == len(id_list):
+            messagebox.showerror("로그인 오류", "일치하는 회원이 없습니다.")        
+            break
+         
+        elif id == id_list[num]:
+            result = sign_in(id)
+#             print(result)
+          
+            if result[0] == pw:
+                global my_id
+                my_id = id
+                friend_select_ui(my_id)
+                print(my_id)
+                print(id)
+            else:
+                messagebox.showinfo("비밀번호 오류", "비밀번호가 틀렸습니다.") 
+            break
+         
+        else:
+            num += 1
 
-def delete_account(id):
-    con = connect(host='localhost', user='root', password ='1234', db = 'facebook')
-    cur = con.cursor()
+def sign_up_process():
+    id = join_id_input.get()
+    pw = join_pw_input.get()
+    name = name_input.get()
+    gender = gender_input
+    birthday = birthday_input.get()
+    country = country_input.get()
+    city = city_input.get()
     
-    sql = "delete from members where id = '%s' " % id
+    all_id = list(select_all_id())
+    id_list = list()
     
-    cur.execute(sql)
-    con.commit()
-    con.close()
-
-def select_my_info(id): # 게시판 관련 함수
-    con = connect(host='localhost', user='root', password ='1234', db = 'facebook')
-    cur = con.cursor()
+    for n in range(len(all_id)):
+        id_list.append(all_id[n][0])
+    
+    print(id_list)
+    
+    num = 0     
+    while True:  
+        if num <= len(id_list):
+            if id == "" or pw == "" or name == "" or gender == "" or birthday == "" or country == "" or city == "":
+                messagebox.showinfo("회원가입 오류", "모든 칸을 입력하셔야 합니다.") 
+                break               
+                                   
+        elif num == len(id_list):    
+            if id != "" and pw != "" and name != "" and gender != "" and birthday != "" and country != "" and city != "":
+                sign_up(id, pw, name, country, city, birthday, gender)
+                messagebox.showinfo("회원가입 완료", "회원가입 완료!!")
+                break
         
-    sql = "select * from members where id = '%s'" % id
-    
-    cur.execute(sql)
-    
-    record = list(cur.fetchone())
-    
-#     for r in record:
-#         if r == None:
-#             record.remove(r)        
-    
-    print(record)
-    
-    con.commit()
-    con.close()
-    
-    return record
-
-def select_my_id(my_id):
-    con = connect(host='localhost', user='root', password ='1234', db = 'facebook')
-    cur = con.cursor()
+        elif id == id_list[num]:
+            messagebox.showerror("회원가입 오류", "이미 존재하는 아이디입니다.")
+            break
         
-    sql = "select id from members where id = '%s'" % my_id
-    
-    cur.execute(sql)
-    
-    record = cur.fetchone()
-    
-    con.commit()
-    con.close()
-    
-    return record
+        else:
+            num += 1
 
-def select_all_id():
-    con = connect(host = 'localhost', user='root', password = '1234', db = 'facebook')
-    cur = con.cursor()
+    print(num)
+     
+
+def my_info_update_process():
+    id = my_id
+    pw = pw_input.get()
+    pw2 = pw2_input.get()
+    name = name_input.get()
+    country = country_input.get()
+    city = city_input.get()
+    birthday = birthday_input.get()
+    hobby = hobby_input.get()
+    profile = filename
+    gender = gender_input
     
-    sql = "select id from members"
+    my_info = list(select_my_info(my_id))
+    if gender == None:
+        gender = int(my_info[6])
     
-    cur.execute(sql)
+    item_list = [pw, pw2, name]
+
+    n = 0
+    while True:
+        if item_list[n] != "":
+            n += 1
+            if n == 3:
+                if pw == pw2:
+                    my_info_update(id, pw, name, country, city, birthday, gender, hobby , profile)
+                    messagebox.showinfo("확인", "정보 수정 완료!!")
+                    break
+                else:
+                    messagebox.showerror("비밀번호 오류", "비밀번호가 일치하지 않습니다.")
+                    break
     
-    record = cur.fetchall()
+        else:
+            messagebox.showerror("회원 정보 수정 오류", "필수값(*)은 반드시 입력하셔야 합니다.")
+            break
+
+def delete_account_process():
+    id = my_id
     
-    con.close()
+    delete_account(id)
+
+    messagebox.showinfo("회원 탈퇴 완료", "회원 탈퇴가 완료되었습니다.")
+
+def gender_choice():
+    global gender_input
+    if var.get() == 1:
+        gender_input = "1"
+    elif var.get() == 2:
+        gender_input = "2"
+
+def friends_process():
+    pass
+
+
+
+def delete_account_ui():
+    w = Tk()
+    w.title("회원 탈퇴")
+    w.geometry("240x110")
     
-    return record
+    delete_label = Label(w, font = ("맑은 고딕", 12), text = "정말로 탈퇴하시겠습니까?", fg = "dark blue")
+    yes_btn = Button(w, text = "예", width = 5, font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = delete_account_process)
+    no_btn = Button(w, text = "아니오", width = 5, font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = cancel_ui)
+    
+    delete_label.place(x = 25, y = 10)
+    yes_btn.place(x = 60, y = 60)
+    no_btn.place(x = 130, y = 60)
+
+    w.mainloop()
+
+def cancel_ui():    
+    messagebox.showinfo("취소", "취소되었습니다.")
+
+def mainpage_ui():
+    global var, id_input, pw_input, name_input, join_id_input, join_pw_input, birthday_input, country_input, city_input
+    w = Tk()
+    w.title("facebook 메인페이지")
+    w.geometry("1200x1000")
+    
+    login_id = Label(w, text = "아이디", font = ("맑은 고딕", 13), fg = "dark blue")
+    login_pw = Label(w, text = "패스워드", font = ("맑은 고딕", 13), fg = "dark blue")
+    id_input = Entry(w, font = ("맑은 고딕", 13), width = 15)
+    pw_input = Entry(w, font = ("맑은 고딕", 13), width = 15)
+    login = Button(w, text="로그인", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = sign_in_process)
+    join = Button(w, text="회원가입", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = sign_up_process)
+
+    join_label = Label(w, text="회원가입", font = ("맑은 고딕", 20), fg = "dark blue")  
+    join_name = Label(w, text = "이름", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_id = Label(w, text = "아이디", font = ("맑은 고딕", 12), fg = "dark blue") 
+#     join_id_info = Label(w, text = "", bg = "pink")
+    join_pw = Label(w, text = "패스워드", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_gender = Label(w, text = "성별", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_birthday = Label(w, text = "생일", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_country = Label(w, text = "국가", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_city = Label(w, text = "도시", font = ("맑은 고딕", 12), fg = "dark blue") 
+
+    name_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    join_id_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    join_pw_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    var = IntVar()
+    gender_input1 = Radiobutton(w, text="남", variable = var, value = 1, font = ("맑은 고딕", 13), fg= "dark blue", command = gender_choice)
+    gender_input2 = Radiobutton(w, text="여", variable = var, value = 2, font = ("맑은 고딕", 13), fg= "dark blue", command = gender_choice)
+
+    birthday_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    country_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    city_input = Entry(w, font = ("맑은 고딕", 13), width = 20)   
+ 
+    icon1 = PhotoImage(file="logo.png")
+    pic1 = Label(w)
+    pic1.configure(image=icon1)
+    pic1.image = icon1
+    
+    icon2 = PhotoImage(file="main.png")
+    pic2 = Label(w)
+    pic2.configure(image=icon2)
+    pic2.image = icon2    
+
+         
+    pic1.place(x = 0, y = 0)
+    login_id.place(x = 635, y = 10)
+    id_input.place(x = 715, y = 10)
+    login_pw.place(x = 885, y = 10)
+    pw_input.place(x = 980, y = 10)
+    login.place(x = 1130, y = 8)
+    pic2.place(x = 60, y = 240)
+    
+    join_label.place(x = 840, y = 150)      
+   
+    join_name.place(x = 755, y = 250)     
+    name_input.place(x = 830, y = 250)   
+  
+    join_id.place(x = 755, y = 295)
+    join_id_input.place(x = 830, y = 295)
+#     join_id_info.place(x = 900, y = 285)     
+   
+    join_pw.place(x = 755, y = 340)
+    join_pw_input.place(x = 830, y = 340)
+ 
+    join_gender.place(x = 755, y = 385)         
+    gender_input1.place(x = 850, y = 385)    
+    gender_input2.place(x = 930, y = 385)    
+   
+    join_birthday.place(x = 755, y = 430)
+    birthday_input.place(x = 830, y = 430)     
+   
+    join_country.place(x = 755, y = 475)
+    country_input.place(x = 830, y = 475)
+      
+    join_city.place(x = 755, y = 520)    
+    city_input.place(x = 830, y = 520)
+         
+    join.place(x = 855, y = 580)
+ 
+   
+    w.mainloop()
+       
+def my_info_update_ui(my_id):
+    global photo_label, pw_input, pw2_input, name_input, country_input, city_input, birthday_input, var, hobby_input
+    w = Toplevel()
+    w.title("facebook 회원정보 수정 페이지")
+    w.geometry("850x900")       
+
+    my_info = list(select_my_info(my_id))           
+
+    icon = PhotoImage(file="logo.png")
+    pic = Label(w)
+    pic.configure(image=icon)
+    pic.image = icon
+    
+    my_bulletin = Button(w, text="내 게시판", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = my_bulletin_ui)
+    friend_mngt = Button(w, text="친구 관리", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = my_bulletin_ui)
+       
+    pic_label = Label(w, text = "프로필 사진 수정", font = ("맑은 고딕", 11), fg = "dark blue")
+    photo = PhotoImage()
+    photo_label = Label(w, image = photo, width = 150, height = 150)    
+    pic_button = Button(w, text = "찾아보기", command = pic_choice_ui, fg = "white", bg = "dark blue", font = ("맑은 고딕", 10, "bold"))
+    
+    if my_info[7] != 'None' and my_info[7] != 'NULL':
+        photo2 = PhotoImage(file = my_info[7])
+        original_photo = Label(w, image = photo2, width = 150, height = 150)
+        original_photo.configure(image = photo2)
+        original_photo.image = photo2
+    
+    
+    id_label = Label(w, text = "아이디", font = ("맑은 고딕", 11), fg = "dark blue")
+    pw_label = Label(w, text = "비밀번호(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    pw2_label = Label(w, text = "비밀번호 확인(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    name_label = Label(w, text = "이름(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    country_label = Label(w, text = "국가", font = ("맑은 고딕", 11), fg = "dark blue")
+    city_label = Label(w, text = "도시", font = ("맑은 고딕", 11), fg = "dark blue")
+    birthday_label = Label(w, text = "생일", font = ("맑은 고딕", 11), fg = "dark blue")
+    gender_label = Label(w, text = "성별(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    hobby_label = Label(w, text = "취미", font = ("맑은 고딕", 11), fg = "dark blue")
+    
+    
+    id_var = StringVar(w, value = my_info[0])
+    id = Entry(w, textvariable = id_var, state=DISABLED, font = ("맑은 고딕", 13), bg = "grey", width = 15)
+    pw_var = StringVar(w, value = my_info[1])
+    pw_input = Entry(w, textvariable = pw_var, font = ("맑은 고딕", 13), width = 15)
+    pw2_input = Entry(w, textvariable = pw_var, font = ("맑은 고딕", 13), width = 15)
+    name_var = StringVar(w, value = my_info[2])
+    name_input = Entry(w, textvariable = name_var, font = ("맑은 고딕", 13), width = 15)
+    country_var = StringVar(w, value = my_info[3])
+    country_input = Entry(w, textvariable = country_var, font = ("맑은 고딕", 13), width = 15)
+    city_var = StringVar(w, value = my_info[4])
+    city_input = Entry(w, textvariable = city_var, font = ("맑은 고딕", 13), width = 15)
+    birthday_var = StringVar(w, value = my_info[5])
+    birthday_input = Entry(w, textvariable = birthday_var, font = ("맑은 고딕", 13), width = 15)
+    
+    var = IntVar(w, value = int(my_info[6]))
+
+    gender_input1 = Radiobutton(w, text="남", variable = var, value = 1, font = ("맑은 고딕", 13), fg= "dark blue", command = gender_choice)
+    gender_input2 = Radiobutton(w, text="여", variable = var, value = 2, font = ("맑은 고딕", 13), fg= "dark blue", command = gender_choice)
+    
+    if my_info[8] != NULL:
+        hobby_var = StringVar(w, value = my_info[8])
+    else:
+        hobby_var = StringVar()
+
+    hobby_input = Entry(w, textvariable = hobby_var, font = ("맑은 고딕", 13), width = 15)
+   
+    update = Button(w, text = "수정", bg = "dark blue", fg = "white", font = ("맑은 고딕", 10, "bold"), command = my_info_update_process)  
+    cancel = Button(w, text = "취소", bg = "dark blue", fg = "white", font = ("맑은 고딕", 10, "bold"), command = quit)
+    delete = Button(w, text = "회원탈퇴", bg = "dark blue", fg = "white", font = ("맑은 고딕", 10, "bold"), command = delete_account_ui) 
+        
+    pic.place(x = 3, y = 3)
+
+    my_bulletin.place(x=20, y = 200)
+    friend_mngt.place(x=20, y = 250)
+
+    pic_label.place(x=200, y = 210)
+#     pic_entry.place(x=190, y = 240)
+    photo_label.place(x=190, y = 240)
+    if my_info[7] != 'None' and my_info[7] != 'NULL':
+        original_photo.place(x=190, y = 240)
+    pic_button.place(x=232, y = 400)
+     
+    id_label.place(x=410, y = 170)
+    id.place(x=560, y = 170)
+    pw_label.place(x=410, y = 210)
+    pw_input.place(x=560, y = 210)
+    pw2_label.place(x=410, y = 250)
+    pw2_input.place(x=560, y = 250)
+    
+    name_label.place(x=410, y = 290)
+    name_input.place(x=560, y = 290)
+    country_label.place(x=410, y = 330)
+    country_input.place(x=560, y = 330)
+    city_label.place(x=410, y = 370)
+    city_input.place(x=560, y = 370)
+    birthday_label.place(x=410, y = 410)
+    birthday_input.place(x=560, y = 410)
+    gender_label.place(x=410, y = 450)
+    gender_input1.place(x=570, y = 450)
+    gender_input2.place(x=640, y = 450)
+    hobby_label.place(x=410, y = 490)
+    hobby_input.place(x=560, y = 490)
+     
+    update.place(x=370, y = 650)
+    cancel.place(x=420, y = 650)
+    delete.place(x=660, y = 10)
+    
+    
+    w.mainloop()
+
+    
+def pic_choice_ui():   
+    global filename
+    filename = askopenfilename(parent = w, filetypes = (("PNG 파일", "*.png"), ("JPG 파일", "*.jpg")))
+    photo = PhotoImage(file = filename)
+    photo_label.configure(image = photo)
+    photo_label.image = photo
+    print(filename)
+    
+    
+        
+if __name__ == '__main__':
+    mainpage_ui()
