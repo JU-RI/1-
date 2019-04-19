@@ -1,0 +1,86 @@
+from tkinter import *
+from board.친구crud import *
+
+# +더보기 기능
+record, result, id_input, name_input, country_input, city_input, profile_view = None, None, None, None, None, None, None
+
+def friend_select_process():
+    print("검색된 회원 정보")
+    global name, record
+    name = name_input.get()
+    record = friend_select(name)
+    friend_select_result_ui(record)
+    
+    
+def friend_list_process():
+    global result
+    print("친구 목록 출력")
+    result = friend_list()
+    friend_list_ui(result)
+
+
+
+
+def friend_select_result_ui(record):
+    global id_input, pw_input, name_input, tel_input
+    w = Tk()
+    w.geometry("500x400")
+    w.title("검색된 회원 정보")
+    w.configure(bg = "orange")
+    
+    id_text = Label(w, text = "검색된 아이디", font = ("고딕", 30), fg = "white", bg = "orange")
+    pw_text = Label(w, text = "검색된 암호", font = ("고딕", 30), fg = "white", bg = "orange")
+    name_text = Label(w, text = "검색된 이름", font = ("고딕", 30), fg = "white", bg = "orange")
+    tel_text = Label(w, text = "검색된 전화번호", font = ("고딕", 30), fg = "white", bg = "orange")
+    
+    id_input = Label(w, text = record[0], font = ("고딕", 20), fg = "black", bg = "white", width = 12)
+    pw_input = Label(w, text = record[1], font = ("고딕", 20), fg = "black", bg = "white", width = 12)
+    name_input = Label(w, text = record[2], font = ("고딕", 20), fg = "black", bg = "white", width = 12)
+    tel_input = Label(w, text = record[3], font = ("고딕", 20), fg = "black", bg = "white", width = 12)
+    
+    id_text.pack()
+    id_input.pack()
+    pw_text.pack()
+    pw_input.pack()
+    name_text.pack()
+    name_input.pack()
+    tel_text.pack()
+    tel_input.pack()
+    
+    w.mainloop()
+    
+    
+def friend_list_ui(result):
+    w = Tk()
+    w.geometry("500x500")
+    w.title("친구목록")
+    w.configure(bg = "white")
+    
+    profile_text = Label(w, text = "프로필사진", font = ("맑은 고딕", 10), fg = "blue", bg = "white")
+    name_text = Label(w, text = "이름", font = ("맑은 고딕", 10), fg = "blue", bg = "white")
+    country_text = Label(w, text = "country", font = ("맑은 고딕", 10), fg = "blue", bg = "white")
+    city_text = Label(w, text = "city", font = ("맑은 고딕", 10), fg = "blue", bg = "white")
+    
+    profile_text.grid(row = 0, column = 0)
+    name_text.grid(row = 0, column = 1)
+    country_text.grid(row = 0, column = 2)
+    city_text.grid(row = 0, column = 3)
+    
+    print(len(result))
+    
+    start = 1   # row 증가시켜주는 변수값
+    for record in result:
+        profile_input = Label(w, text = record[0])
+        name_input = Label(w, text = record[1])
+        country_input = Label(w, text = record[2])
+        city_input = Label(w, text = record[3])
+         
+        profile_input.grid(row = start, column = 0)
+        name_input.grid(row = start, column = 1)
+        country_input.grid(row = start, column = 2)
+        city_input.grid(row = start, column = 3)
+        
+        start += 1
+
+    w.mainloop()
+
