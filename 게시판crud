@@ -1,0 +1,51 @@
+import pymysql
+
+con = None
+
+def insert(content_num, friend_num, writer_id, writer_name, content):
+    con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "insert into board values('%s', '%s', '%s', '%s', '%s')" % (content_num, friend_num, writer_id, writer_name, content)
+    cur.execute(sql)
+    print("sql문 -> 전송 성공")
+    con.commit()
+    con.close()
+
+    
+def content_list():   #게시물 목록 출력
+    con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "select * from board"
+    cur.execute(sql)
+
+    result = []
+    while True:
+        record = cur.fetchone()
+        if record == None:
+            break
+        else:
+            print(record)
+            result.append(record)  
+    con.commit()
+    con.close()
+    return result
+
+
+def update(content, content_num):   
+    con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "update board set content = '%s' where content_num = '%s'" % (content, content_num)
+    cur.execute(sql)
+    print("sql문 -> 전송 성공")
+    con.commit()
+    con.close()
+
+
+def delete(content_num):
+    con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "delete from board where content_num = '%s'" % (content_num)
+    cur.execute(sql)
+    print("sql문 -> 전송 성공")
+    con.commit()
+    con.close()
