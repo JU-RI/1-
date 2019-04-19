@@ -1,0 +1,39 @@
+from board.친구검색db import *
+
+
+if __name__ == '__main__':
+    w = ()
+    w.geometry("1000x800")
+    w.title("친구 검색")
+    w.configure(bg = "dark gray")
+    
+    icon = PhotoImage(file = "web.png")
+    logo = Label(w, image = icon)
+    logo.place(x = 15, y = 15)
+    
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 10), command = friend_list_ui)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10))#command = 마이페이지로
+    button1.place(x = 830, y = 15)
+    button2.place(x = 900, y = 15)
+    
+
+    
+    
+    
+
+# 내 정보 불러오기    
+    
+#     profile = PhotoImage(file = "web.png")
+#     profile_view = Label(w, image = profile)
+#     name_input = Label(w, text = record[1], font = ("맑은 고딕", 20), fg = "black", bg = "white")
+# 
+#     profile.pack()
+#     profile_view.pack()
+#     name_input.pack()
+#     
+#     select(name)
+    
+    add = Button(w, text = "친구 추가", font = ("맑은 고딕", 13), command = friend_insert)
+    add.pack()
+    
+    w.mainloop()
