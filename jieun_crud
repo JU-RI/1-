@@ -57,9 +57,9 @@ def select_my_info(id): # 게시판 관련 함수
     
     record = list(cur.fetchone())
     
-    for r in record:
-        if r == None:
-            record.remove(r)        
+#     for r in record:
+#         if r == None:
+#             record.remove(r)        
     
     print(record)
     
