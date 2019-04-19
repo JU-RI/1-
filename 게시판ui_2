@@ -1,0 +1,44 @@
+from tkinter import *
+from board.내게시판db import *
+from board.친구검색db import *
+
+
+
+if __name__ == '__main__':
+    w = Toplevel()
+    w.geometry("1000x800")
+    w.title("내 게시판")
+    w.configure(bg = "white")
+    
+    icon = PhotoImage(file = "web.png")
+    logo = Label(w, image = icon)
+    logo.place(x = 15, y = 15)
+    
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 10), command = friend_list_process)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10))#command = 마이페이지로
+    button1.place(x = 830, y = 15)
+    button2.place(x = 900, y = 15)
+    
+    select = Button(w, text = "검색", font = ("맑은 고딕", 10), width = 80, command = friend_select_process)
+    select.place(x = 250, y = 100)
+    
+    icon2 = PhotoImage(file = "web.png")
+    profile = Label(w, image = icon2)
+    profile.place(x = 250, y = 150)
+    profile2 = Label(w, text = "내 정보", width = 50)
+    profile2.place(x = 400, y = 150)
+
+    content_input = Entry(w, font = ("맑은 고딕", 10), width = 80)
+    content_input2 = Button(w, text = "등록", font = ("맑은 고딕", 10), width = 80, command = insert_ui)
+    content_input.place(x = 250, y = 300)
+    content_input2.place(x = 250, y = 350)
+    
+    content = Button(w, text = "게시물 보기", font = ("맑은 고딕", 10), width = 80, command = content_list_process)
+    content_update = Button(w, text = "수정", font = ("맑은 고딕", 10), width = 38, command = update)
+    content_delete = Button(w, text = "삭제", font = ("맑은 고딕", 10), width = 38, command = delete)
+    
+    content.place(x = 250, y = 400)
+    content_update.place(x = 250, y = 450)
+    content_delete.place(x = 544, y = 450)
+
+    w.mainloop()
