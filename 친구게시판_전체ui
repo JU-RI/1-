@@ -1,0 +1,158 @@
+from tkinter import *
+from board.친구게시판crud import *
+from board.친구게시판_메인ui import *
+from idlelib.idle_test.mock_tk import Var
+import tkinter.messagebox
+
+content_input, Var = None, None
+
+
+def insert_process():
+    global content
+    content = content_input.get()
+    insert()
+    print("< 게시물 등록 완료 >")
+
+
+# def content_list_process():
+#     global result
+#     result = content_list()
+#     content_list_ui(result)
+#     print("< 게시물 목록 출력 >")
+
+       
+def update_process():
+    global content
+    content = content_input.get()
+    update()
+    print("< 게시물 수정 완료 >")
+    
+    
+def delete_process():
+    global content_num
+#     content_num = content_num_input.get()
+    delete()
+    print("< 게시물 삭제 완료 >")
+    
+
+'''=============================================================================================='''
+
+'''
+def insert_ui():
+    global content_input, Var
+    w = Toplevel()
+    w.geometry("1200x1000")
+    w.title("게시물 등록")
+    w.configure(bg = "white")
+    
+    now = datetime.datetime.now()
+    
+    date_text = Label(w, text = now, font = ("맑은 고딕", 15), fg = "black", bg = "white")
+    content_text = Label(w, text = "게시물 내용 입력", font = ("맑은 고딕", 15), fg = "white", bg = "dark gray")
+    content_input = Entry(w, font = ("맑은 고딕", 15), fg = "black", bg = "white", width = 30)
+
+    date_text.pack()
+    content_text.pack()
+    content_input.pack()
+    
+    insert = Button(w, text = "등록", font = ("맑은 고딕", 10), fg = "white", bg = "purple", command = insert_process)
+    insert.pack()
+    
+    w.mainloop()
+'''
+
+def update_ui():
+    global content_num_input, writer_name_input, content_input
+    w = Toplevel()
+    w.geometry("500x400")
+    w.title("게시물 내용 수정")
+    
+    # content_num, writer_name, created 시간 - 수정하면 바뀌도록 // stringVar
+    content_num_text = Label(w, text = "수정할 게시물 내용 입력", font = ("맑은 고딕", 15), fg = "white", bg = "dark gray")
+    content_num_input = Entry(w, font = ("맑은 고딕", 20), fg = "black", bg = "white", width = 15)
+    writer_id_text = Label(w, text = "글쓴이 ID 입력", font = ("맑은 고딕", 15), fg = "white", bg = "dark gray")
+    writer_id_input = Entry(w, font = ("맑은 고딕", 15), fg = "black", bg = "white", width = 30) 
+    writer_name_text = Label(w, text = "수정할 게시물 작성자 입력", font = ("맑은 고딕", 15), fg = "white", bg = "dark gray")
+    writer_name_input = Entry(w, font = ("맑은 고딕", 20), fg = "black", bg = "white", width = 15)
+    content_text = Label(w, text = "게시물 내용 입력", font = ("맑은 고딕", 15), fg = "white", bg = "dark gray")
+    content_input = Entry(w, font = ("맑은 고딕", 15), fg = "black", bg = "white", width = 30)
+    
+    content_num.pack()
+    content_num_input.pack()
+    content_text.pack()
+    content_input.pack()
+    writer_id_text.pack()
+    writer_id_input.pack()
+    writer_name_text.pack()
+    writer_name_input.pack()
+
+    button_y = Button(w, text = "수정", font = ("맑은 고딕", 15), command = update_process)
+    button_n = Button(w, text = "취소", font = ("맑은 고딕", 15), command = quit)
+    button_y.place(side = LEFT)
+    button_n.place(side = LEFT)
+    
+    w.mainloop()
+    
+
+
+def delete_content_list_ui():
+    w = Toplevel()
+    w.geometry("500x500")
+    w.title("게시물 목록")
+    w.configure(bg = "white")
+     
+    
+    contList = content_list() 
+    
+    start = 1
+    for record in contList:
+#         profiles = Label(w, text = record[])
+        conNums = Label(w, text = record[0], font = ("맑은 고딕", 13), fg = "black", bg = "gray", width = 5)
+        names = Label(w, text = record[1], font = ("맑은 고딕", 13), fg = "black", bg = "gray", width = 10)
+        dates = Label(w, text = record[3], font = ("맑은 고딕", 13), fg = "black", bg = "gray", width = 40)
+        contents = Label(w, text = record[2], font = ("맑은 고딕", 13), fg = "black", bg = "gray", width = 50)
+         
+#         profiles.place(x = 250, )
+        conNums.grid(row = start, column = 20)
+        names.grid(row = start, column = 400)
+        dates.grid(row = start, column = 400)
+        contents.grid(row = start, column = 420)
+        start += 1
+        
+        ### 게시물 수정, 삭제 버튼
+        delete = Button(w, text = "삭제", font = ("맑은 고딕", 10), fg = "dark gray", bg = "white", width = 38, command = msgbox_delete)
+        delete.place(x = 544, y = 450)
+    
+
+          
+      
+    w.mainloop()
+
+
+ 
+def delete_ui():
+    global content_input, content_num_input, writer_name_input
+    w = Tk()
+    w.geometry("500x400")
+    w.title("게시물 삭제")
+    # 게시물을 삭제하시겠습니까? 메시지 박스 띄워서 예는 ok, 아니오는 quit
+    content_num_text = Label(w, text = "삭제할 게시물 번호 입력", font = ("맑은 고딕", 15), fg = "white", bg = "dark gray")
+    content_num_input = Entry(w, font = ("맑은 고딕", 20), fg = "black", bg = "white", width = 15)
+    writer_name_text = Label(w, text = "삭제할 게시물 작성자 입력", font = ("맑은 고딕", 15), fg = "white", bg = "dark gray")
+    writer_name_input = Entry(w, font = ("맑은 고딕", 20), fg = "black", bg = "white", width = 15)
+    
+    content_num_text.pack()
+    content_num_input.pack()
+    writer_name_text.pack()
+    writer_name_input.pack()
+    
+    button_y = Button(w, text = "삭제", font = ("맑은 고딕", 15), command = delete_process)
+    button_n = Button(w, text = "취소", font = ("맑은 고딕", 15), command = quit)
+    button_y.place(side = LEFT)
+    button_n.place(side = LEFT)
+    
+    w.mainloop()
+    
+
+def msgbox_delete():
+    tkinter.messagebox.askokcancel("메시지 상자", "삭제하시겠습니까?")
