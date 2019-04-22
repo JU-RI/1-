@@ -1,0 +1,84 @@
+from tkinter import *
+from board.친구게시판crud import *
+from board.친구게시판ui import *
+from board.친구검색db import *
+from board.crud import *
+from board.ui import *
+
+
+
+def Board_ui():
+    global content_input
+    w = Toplevel()
+    w.geometry("1000x700")
+    w.title("게시판")
+    w.configure(bg = "white")
+    
+    logo_icon = PhotoImage(file = "web.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 15, y = 15)
+    
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 10), command = friend_list_process)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10))#command = my_info_update_ui
+    button1.place(x = 830, y = 15)
+    button2.place(x = 900, y = 15)
+    
+    select = Button(w, text = "검색", font = ("맑은 고딕", 10), width = 80, command = friend_select_process)
+    select.place(x = 250, y = 100)
+
+    
+    ### 친구 정보 출력
+    info = Info()
+    infoList = []
+    for i in info:
+        infoList.append([i][0])
+    
+    profile_icon = PhotoImage(file = "web.png")    #profile
+    profile = Label(w, image = profile_icon)
+    name = Label(w, text = infoList[2], font = ("맑은 고딕", 15), fg = "dark gray", width = 40)
+    birthday = Label(w, text = infoList[5], font = ("맑은 고딕", 15), fg = "dark gray", width = 40)
+    country_city = Label(w, text = infoList[3:5], font = ("맑은 고딕", 15), fg = "dark gray", width = 40)
+    
+    profile.place(x = 250, y = 150)
+    name.place(x = 370, y = 150)
+    birthday.place(x = 370, y = 184)
+    country_city.place(x = 370, y = 218)
+    
+
+    ### 게시물 등록
+    content_input = Entry(w, font = ("맑은 고딕", 15), fg = "black", bg = "white", width = 51)
+    content_input.place(x = 250, y = 300)
+    
+    insert = Button(w, text = "등록", font = ("맑은 고딕", 10), fg = "white", bg = "blue", width = 6,
+                    command = insert_process)
+    insert.place(x = 820, y = 300)
+
+    
+    ### 게시물 목록 출력 
+    contList = content_list() 
+    
+    start = 1
+    for record in contList:
+#         profiles = Label(w, text = record[])
+        conNums = Label(w, text = record[0], font = ("맑은 고딕", 13), fg = "black", bg = "gray", width = 5)
+        names = Label(w, text = record[1], font = ("맑은 고딕", 13), fg = "black", bg = "gray", width = 10)
+        dates = Label(w, text = record[3], font = ("맑은 고딕", 13), fg = "black", bg = "gray", width = 40)
+        contents = Label(w, text = record[2], font = ("맑은 고딕", 13), fg = "black", bg = "gray", width = 50)
+         
+#         profiles.place(x = 250, )
+        conNums.grid(row = start, column = 20)
+        names.grid(row = start, column = 400)
+        dates.grid(row = start, column = 400)
+        contents.grid(row = start, column = 420)
+        start += 1
+        
+        ### 게시물 수정, 삭제 버튼
+        content_update = Button(w, text = "수정", font = ("맑은 고딕", 10), fg = "dark gray", bg = "white", width = 38, command = update)
+        content_delete = Button(w, text = "삭제", font = ("맑은 고딕", 10), fg = "dark gray", bg = "white", width = 38, command = msgbox_delete)
+        content_update.place(x = 250, y = 450)
+        content_delete.place(x = 544, y = 450)
+    
+    w.mainloop()
+    
+if __name__ == '__main__':
+    Board_ui()
