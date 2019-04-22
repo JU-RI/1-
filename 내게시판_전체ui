@@ -1,0 +1,76 @@
+from tkinter import *
+from board.내게시판crud import *
+from board.내게시판_메인ui import *
+
+content_num_input, content_input = None, None
+
+
+def insert_process():
+    global content
+    content = content_input.get()
+    insert()
+    print("< 게시물 등록 완료 >")
+
+
+def update_process():
+    global content_num, content
+    content_num = content_num_input.get()
+    content = content_input.get()
+    update()
+    print("< 게시물 수정 완료 >")
+    
+    
+def delete_process():
+    global content_num
+    content_num = content_num_input.get()
+    delete()
+    print("< 게시물 삭제 완료 >")
+    
+
+'''=============================================================================================='''
+
+
+def update_ui():
+    global content_num_input, content_input
+    w = Toplevel()
+    w.geometry("300x300")
+    w.title("게시물 수정")
+    w.configure(bg = "white")
+    
+    content_num_text = Label(w, text = "게시물 번호 입력", font = ("맑은 고딕", 10), fg = "black", bg = "white")
+    content_num_input = Entry(w, font = ("맑은 고딕", 20), fg = "black", bg = "white", width = 15)
+    content_num_text.pack()
+    content_num_input.pack()
+    
+    content_text = Label(w, text = "게시물 내용 입력", font = ("맑은 고딕", 10), fg = "black", bg = "white")
+    content_input = Entry(w, font = ("맑은 고딕", 20), fg = "black", bg = "white", width = 15)
+    content_text.pack()
+    content_input.pack()
+    
+    button_y = Button(w, text = "수정", font = ("맑은 고딕", 10), fg = "white", bg = "blue", width = 7, command = update_process)
+    button_n = Button(w, text = "취소", font = ("맑은 고딕", 10), bg = "white", width = 7, command = quit)
+    button_y.place(x = 90, y = 250)
+    button_n.place(x = 160, y = 250)
+    
+    # 게시물 번호가 있는지 없는지 if
+    w.mainloop() 
+
+ 
+def delete_ui():
+    global content_num_input
+    w = Tk()
+    w.geometry("300x150")
+    w.title("게시물 삭제")
+    w.configure(bg = "white")
+
+    content_num_text = Label(w, text = "게시물 번호 입력", font = ("맑은 고딕", 10), fg = "black", bg = "white")
+    content_num_input = Entry(w, font = ("맑은 고딕", 20), fg = "black", bg = "white", width = 15)
+    content_num_text.pack()
+    content_num_input.pack()
+
+    button_y = Button(w, text = "삭제", font = ("맑은 고딕", 10), fg = "white", bg = "red", width = 7, command = delete_process)
+    button_n = Button(w, text = "취소", font = ("맑은 고딕", 10), bg = "white", width = 7, command = quit)
+    button_y.place(x = 90, y = 100)
+    button_n.place(x = 160, y = 100)
+    
+    w.mainloop()
