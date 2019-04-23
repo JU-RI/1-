@@ -1,86 +1,143 @@
 from tkinter import *
-from board.친구crud import *
+from board.친구검색crud import *
+from board.내게시판_메인ui import *
+from board.ui import *
 
 # +더보기 기능
-record, result, id_input, name_input, country_input, city_input, profile_view = None, None, None, None, None, None, None
+record, result, name_input, country_input, city_input, user1_id_input = None, None, None, None, None, None
 
-def friend_select_process():
-    print("검색된 회원 정보")
-    global name, record
+def friend_insert_process():    #친구 추가
+    global name
     name = name_input.get()
-    record = friend_select(name)
-    friend_select_result_ui(record)
+    friend_insert()
+    print("< 친구 추가 완료 >")
+
+
+def member_select_process():    #회원 검색
+    global name, country, city, record
+    name = select_input.get()
+    country = select_input.get()
+    city = select_input.get()
+    
+    record = member_select()
+    member_list = []
+    
+    for i in record:
+        member_list.append([i][0])
+         
+    while True:                 
+        if name or country or city not in member_list:
+            messagebox.showerror("오류", "일치하는 회원이 없습니다.")        
+            break
+        else:
+            update()
+            print("< 검색된 회원 목록 출력 완료 >")\
+            
+    member_select_ui(record)
     
     
-def friend_list_process():
-    global result
-    print("친구 목록 출력")
-    result = friend_list()
+def friend_select_process():
+    global user1_id, result
+    result = friend_select(user1_id)
     friend_list_ui(result)
+    
+    
+    
+    
 
-
-
-
-def friend_select_result_ui(record):
-    global id_input, pw_input, name_input, tel_input
-    w = Tk()
-    w.geometry("500x400")
-    w.title("검색된 회원 정보")
-    w.configure(bg = "orange")
-    
-    id_text = Label(w, text = "검색된 아이디", font = ("고딕", 30), fg = "white", bg = "orange")
-    pw_text = Label(w, text = "검색된 암호", font = ("고딕", 30), fg = "white", bg = "orange")
-    name_text = Label(w, text = "검색된 이름", font = ("고딕", 30), fg = "white", bg = "orange")
-    tel_text = Label(w, text = "검색된 전화번호", font = ("고딕", 30), fg = "white", bg = "orange")
-    
-    id_input = Label(w, text = record[0], font = ("고딕", 20), fg = "black", bg = "white", width = 12)
-    pw_input = Label(w, text = record[1], font = ("고딕", 20), fg = "black", bg = "white", width = 12)
-    name_input = Label(w, text = record[2], font = ("고딕", 20), fg = "black", bg = "white", width = 12)
-    tel_input = Label(w, text = record[3], font = ("고딕", 20), fg = "black", bg = "white", width = 12)
-    
-    id_text.pack()
-    id_input.pack()
-    pw_text.pack()
-    pw_input.pack()
-    name_text.pack()
-    name_input.pack()
-    tel_text.pack()
-    tel_input.pack()
-    
-    w.mainloop()
+'''=============================================================================================='''
     
     
-def friend_list_ui(result):
-    w = Tk()
-    w.geometry("500x500")
-    w.title("친구목록")
+def member_select_ui():
+    global select_input
+    w = Toplevel()
+    w.geometry("1000x700")
+    w.title("회원 검색 결과")
     w.configure(bg = "white")
     
-    profile_text = Label(w, text = "프로필사진", font = ("맑은 고딕", 10), fg = "blue", bg = "white")
-    name_text = Label(w, text = "이름", font = ("맑은 고딕", 10), fg = "blue", bg = "white")
-    country_text = Label(w, text = "country", font = ("맑은 고딕", 10), fg = "blue", bg = "white")
-    city_text = Label(w, text = "city", font = ("맑은 고딕", 10), fg = "blue", bg = "white")
+    logo_icon = PhotoImage(file = "web.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 15, y = 15)
     
-    profile_text.grid(row = 0, column = 0)
-    name_text.grid(row = 0, column = 1)
-    country_text.grid(row = 0, column = 2)
-    city_text.grid(row = 0, column = 3)
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 10), command = friend_list_ui)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10), command = my_info_update_ui)
+    button1.place(x = 830, y = 15)
+    button2.place(x = 900, y = 15)
+      
     
-    print(len(result))
-    
-    start = 1   # row 증가시켜주는 변수값
-    for record in result:
-        profile_input = Label(w, text = record[0])
-        name_input = Label(w, text = record[1])
-        country_input = Label(w, text = record[2])
-        city_input = Label(w, text = record[3])
-         
-        profile_input.grid(row = start, column = 0)
-        name_input.grid(row = start, column = 1)
-        country_input.grid(row = start, column = 2)
-        city_input.grid(row = start, column = 3)
-        
-        start += 1
+    ### 검색된 회원 목록 출력
+    memList = member_select()
+    print(memList)
 
+    for record in memList:
+        profiles_icon = PhotoImage(file = record[0])
+        profiles = Label(w, image = profiles_icon, width = 100, height = 100)
+        names = Label(w, text = record[1], font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 10)
+        countries = Label(w, text = record[2], font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 40)
+        cities = Label(w, text = record[3], font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 50)
+        
+        ### 친구 추가 버튼
+        fri_insert = Button(w, text = "등록", font = ("맑은 고딕", 10), fg = "white", bg = "blue", width = 6,
+                        command = friend_insert_process)
+        
+        profiles.place(x = 500, y = 500)
+        names.place(x = 500, y = 550)
+        countries.place(x = 500, y = 570)
+        cities.place(x = 500, y = 590)
+        fri_insert.place(x = 820, y = 300)
+    
+    
     w.mainloop()
 
+
+def friend_list_ui():   #친구 목록 보기
+    global select_input
+    w = Toplevel()
+    w.geometry("1000x700")
+    w.title("친구 목록")
+    w.configure(bg = "white")
+    
+    logo_icon = PhotoImage(file = "web.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 15, y = 15)
+    
+    button1 = Button(w, text = "내 게시판", font = ("맑은 고딕", 10), command = myBoard_ui)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10), command = my_info_update_ui)
+    button1.place(x = 830, y = 15)
+    button2.place(x = 900, y = 15)
+    
+    user1_id = '100'
+    friendList = friend_select(user1_id)
+    print(friendList)
+    result = list(myInfo(id))
+    
+    for record in friendList:
+        profiles_icon = PhotoImage(file = result[7])
+        profiles = Label(w, image = profiles_icon, width = 100, height = 100)
+        names = Label(w, text = result[1], font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 10)
+        countries = Label(w, text = result[2], font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 40)
+        cities = Label(w, text = result[3], font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 50)
+        
+        profiles.place(x = 250, y = 400)
+        names.place(x = 380, y = 400)
+        countries.place(x = 410, y = 400)
+        cities.place(x = 360, y = 450)
+    
+    
+    ### 친구 추가 버튼
+    fri_insert = Button(w, text = "등록", font = ("맑은 고딕", 10), fg = "white", bg = "blue", width = 6, 
+                        command = friend_insert_process)
+    
+    profiles.place(x = 500, y = 500)
+    names.place(x = 500, y = 550)
+    countries.place(x = 500, y = 570)
+    cities.place(x = 500, y = 590)
+    fri_insert.place(x = 820, y = 300)
+
+         
+    w.mainloop()
+    
+if __name__ == '__main__':
+#     member_select_ui()
+    friend_list_ui()
+    
