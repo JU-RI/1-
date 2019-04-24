@@ -1,12 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
-from board.내게시판crud import *
-
-from tkinter import *
-from board.내게시판crud import *
-from board.친구검색ui import *
-# from board.crud import *
-# from board.ui import *
+from facebook.crud import *
+from facebook.friend_list_UI import *
 
 content_num_input, content_input = None, None
 
@@ -23,40 +18,16 @@ def update_process():
     global content_num, content
     content_num = content_num_input.get()
     content = content_input.get()
-    
-    conNum = content_list()
-    conNum_list = []
-    
-    for i in conNum:
-        conNum_list.append([i][0])
-         
-    while True:                 
-        if content_num not in conNum_list:
-            messagebox.showerror("게시물 번호 오류", "없는 게시물 번호입니다.")        
-            break
-        else:
-            update(content, content_num)
-            print("< 게시물 수정 완료 >")
-    
+    update(content_num, content)
+    print("< 게시물 수정 완료 >")
+
     
 def delete_process():
     global content_num
     content_num = content_num_input.get()
-    
-    conNum = content_list()
-    conNum_list = []
-    
-    for i in conNum:
-        conNum_list.append([i][0])
-         
-    while True:                 
-        if content_num not in conNum_list:
-            messagebox.showerror("게시물 번호 오류", "없는 게시물 번호입니다.")        
-            break
-        else:
-            delete(content_num)
-            print("< 게시물 삭제 완료 >")
-    
+    delete(content_num)
+    print("< 게시물 삭제 완료 >")
+        
 
 '''=============================================================================================='''
 
@@ -106,7 +77,10 @@ def delete_ui():
     w.mainloop()
 
 
-def myBoard_ui(): #내게시판 버튼 누를 때 아이디 연동되도록
+'''=============================================================================================='''
+    
+    
+def myBoard_ui(): #메인
     global content_input
     w = Toplevel()
     w.geometry("1000x700")
@@ -117,24 +91,22 @@ def myBoard_ui(): #내게시판 버튼 누를 때 아이디 연동되도록
     logo = Label(w, image = logo_icon)
     logo.place(x = 15, y = 15)
     
-    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 10), command = friend_list_ui)
-    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10), command = my_info_update_ui)
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 10), bg = "white", command = friend_list_ui)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10), bg = "white", command = my_info_update_ui)
     button1.place(x = 830, y = 15)
     button2.place(x = 900, y = 15)
     
     
     ### 검색
     select_input = Entry(w, font = ("맑은 고딕", 15), fg = "black", bg = "white", width = 46)
-    select_input.place(x = 250, y = 100)
+    select_input.place(x = 220, y = 100)
     
     select = Button(w, text = "검색", font = ("맑은 고딕", 10), fg = "black", bg = "white", width = 6,
                     command = member_select_ui)
-    select.place(x = 765, y = 100)
+    select.place(x = 735, y = 100)
 
     
     ### 내 정보 출력
-#     id = '100'
-    
     info = myInfo()
     infoList = []
     for i in info:
@@ -146,49 +118,48 @@ def myBoard_ui(): #내게시판 버튼 누를 때 아이디 연동되도록
     birthday = Label(w, text = infoList[5], font = ("맑은 고딕", 15), fg = "dark gray", width = 40)
     country_city = Label(w, text = infoList[3:5], font = ("맑은 고딕", 15), fg = "dark gray", width = 40)
     
-    profile.place(x = 250, y = 150)
-    name.place(x = 370, y = 150)
-    birthday.place(x = 370, y = 184)
-    country_city.place(x = 370, y = 218)
+    profile.place(x = 220, y = 150)
+    name.place(x = 340, y = 150)
+    birthday.place(x = 340, y = 184)
+    country_city.place(x = 340, y = 218)
     
 
     ### 게시물 등록
     content_input = Text(w, font = ("맑은 고딕", 12), fg = "black", bg = "white", width = 63, height = 4)
-    content_input.place(x = 247, y = 300)
+    content_input.place(x = 217, y = 270)
     
     content_insert = Button(w, text = "등록", font = ("맑은 고딕", 10), fg = "white", bg = "blue", width = 6,
                     command = insert_process)
-    content_insert.place(x = 823, y = 300)
+    content_insert.place(x = 793, y = 270)
 
     
-    ### 게시물 목록 출력 
+    ### 게시물 목록 출력
     contList = content_list()
-    result = list(myInfo())
-    print(result)
+    contList2 = list(reversed(contList))    #역순으로 정렬
+    writerInfo = list(wriInfo())
     
-    y1 = 400
-    for r in range(len(contList)):
-#         for record in contList:
-        profiles_icon = PhotoImage(file = result[7])
-        profiles = Label(w, image = profiles_icon, width = 100, height = 100)
-        conNums = Label(w, text = contList[r][0], font = ("맑은 고딕", 13), fg = "gray", width = 5)
-        names = Label(w, text = result[2], font = ("맑은 고딕", 13), fg = "black", width = 5)
-        contents = Label(w, text = contList[r][1], font = ("맑은 고딕", 13), fg = "black", width = 45)
+    y1 = 370
+    for r in range(len(contList2)):
+        profiles_icon = PhotoImage(file = writerInfo[r][0])
+        profiles = Label(w, image = profiles_icon, width = 80, height = 80)
+        conNums = Label(w, text = contList2[r][0], font = ("맑은 고딕", 10), fg = "gray", bg = "white", width = 5)
+        names = Label(w, text = writerInfo[r][1], font = ("맑은 고딕", 13), fg = "black", bg = "white",  width = 5)
+        contents = Label(w, text = contList2[r][2], font = ("맑은 고딕", 13), fg = "black", width = 45, height = 2)
         
-        profiles.place(x = 250, y = y1)
-        conNums.place(x = 360, y = y1)
-        names.place(x = 400, y = y1)
-        contents.place(x = 360, y = y1 + 30)
-        y1 += 100
+        profiles.place(x = 230, y = y1)
+        conNums.place(x = 330, y = y1 + 3)
+        names.place(x = 370, y = y1)
+        contents.place(x = 330, y = y1 + 30)
+        y1 += 90
 
     
     ### 게시물 수정, 삭제 버튼
     content_update = Button(w, text = "수정", font = ("맑은 고딕", 10), fg = "black", bg = "white", width = 6,
                     command = update_ui)
-    content_update.place(x = 823, y = 330)
+    content_update.place(x = 793, y = 300)
     content_delete = Button(w, text = "삭제", font = ("맑은 고딕", 10), fg = "red", bg = "white", width = 6,
                     command = delete_ui)
-    content_delete.place(x = 823, y = 360)
+    content_delete.place(x = 793, y = 330)
 
     
     w.mainloop()
