@@ -5,7 +5,7 @@ con = None
 def member_select():    #검색된 회원 목록
     con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = "facebook")
     cur = con.cursor()
-    sql = "select profile, name, country, city from members where (name) = '%s' or (country) = 'Korea' or (city) = '%s'"
+    sql = "select profile, name, country, city from members where (name) = '%s' or (country) = '%s' or (city) = '%s'"
     cur.execute(sql)
     
     result = []
@@ -26,9 +26,8 @@ def member_select():    #검색된 회원 목록
 def friend_select(user1_id):  #친구 목록 출력
     con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
     cur = con.cursor()
-    sql = "select user2_id from friends where user1_id = '%s'" % (user1_id)
+    sql = "select user2_id from friends where user1_id = '%s'" % user1_id
     cur.execute(sql)
-    
     result = []
     while True:
         record = cur.fetchone()
@@ -37,25 +36,25 @@ def friend_select(user1_id):  #친구 목록 출력
         else:
             result.append(list(record))
     print(result)
- 
     con.commit()
     con.close()
     return result
 
 
-def friendInfo(id):    # 내 정보 출력
+
+def friendInfo():    # 친구 정보 출력
     con = pymysql.connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
     cur = con.cursor()
-    sql = "select * from members where id = '100'" #% id
+    sql = "select * from members where id = '200'"
     cur.execute(sql)
-    record = list(cur.fetchone())
-    print() #profile
-    print(record[2])    #name
-    print(record[5])    #birthday
-    print(record[3:5])    #country, city
+    record = list(cur.fetchall())
+#     print(record[0])    #profile
+#     print(record[1])    #name
+#     print(record[2])    #birthday
     con.commit()
     con.close()
     return record
+friendInfo()
 
 
 def friend_insert(user1_id, user2_id):    #친구 추가
