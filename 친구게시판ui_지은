@@ -1,0 +1,128 @@
+id, change_num, friend_id = None,None,None
+
+
+
+def friend_board_ui():
+    global content_input, friend_id, friend_num, id1, id2, select_entry, change_num, content
+    w = Toplevel()
+    w.geometry("1000x1100")
+    w.title("친구 게시판")
+    w.configure()#bg = "white")
+    
+ 
+    logo_icon = PhotoImage(file = "logo.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 15, y = 15)
+ 
+     
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 13, "bold"), fg = "white", bg = "dark blue", width = 8, command = quit)#friend_list_process)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 13, "bold"), fg = "white", bg = "dark blue", command = my_info_update_ui)
+    button1.place(x = 750, y = 15)
+    button2.place(x = 850, y = 15)
+    
+    select_entry = Entry(w, font = ("맑은 고딕", 15), fg = "dark blue", width = 50)
+    select = Button(w, text = "회원검색", font = ("맑은 고딕", 13, "bold"), fg = "white", bg = "dark blue", width = 8, command = member_select_process)
+    select_entry.place(x = 180, y = 115)
+    select.place(x = 750, y = 109)
+ 
+    ### 게시판 주인 정보 출력
+    friend = 'user2' # 친구 아이디 임시 지정
+    info = list(friend_info(friend))
+    infoList = []
+    for i in info:
+        infoList.append([i][0])
+    
+    if infoList[7] == None or infoList[7] == "None":
+        infoList[7] = "test.png"
+    
+    id1 = id
+    id2 = friend
+    friend_num = friend_select(id1, id2)
+ 
+    profile_icon = PhotoImage(file = infoList[7])
+    profile = Label(w, image = profile_icon, width = 150, height = 150)
+    name = Label(w, text = infoList[2], font = ("맑은 고딕", 15), fg = "dark blue", width = 35)
+    birthday = Label(w, text = infoList[5], font = ("맑은 고딕", 15), fg = "dark blue", width = 35)
+    country_city = Label(w, text = infoList[3:5], font = ("맑은 고딕", 15), fg = "dark blue", width = 35)
+    friend_add = Button(w, text="친구추가", font = ("맑은 고딕", 13, "bold"), fg = "white", width = 8, bg = "dark blue", command = friend_insert)
+    friend = Label(w, text="친구", font = ("맑은 고딕", 13, "bold"), fg = "dark blue", bg = "light gray", width = 8)
+ 
+    profile.place(x = 240, y = 170)
+    if friend_num != "":
+        friend.place(x = 740, y = 180)
+    if friend_num == "":
+        friend_add.place(x = 740, y = 180)
+
+    name.place(x = 410, y = 170)
+    birthday.place(x = 410, y = 204)
+    country_city.place(x = 410, y = 238)
+    
+  
+    ### 게시물 등록
+    global content_input
+    content_label = Label(w, text = "친구에게 어떤 말을 하고 싶은가요?(200자 이내로 적어주세요)", font = ("맑은 고딕", 13), fg = "dark blue")
+    content_input = Text(w, font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 70, height = 5)
+    content_label.place(x = 200, y = 310)
+    content_input.place(x = 200, y = 340)
+ 
+    insert = Button(w, text = "등록", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 6, command = content_insert_process)
+    insert.place(x = 755, y = 465)
+ 
+ 
+    ### 게시물 목록 출력 
+    friends = 'user2' # 임시로 친구 아이디 지정
+    cont_num = content_num(friends)
+    
+    y_value = 530
+    for num in cont_num:
+        global friend_id
+        result = content_select(num[0]) # 작성자 아이디, 게시물 내용
+        writer_info = writer_info_select(result[0]) # 작성자 프로필, 이름
+        
+        friend_id = result[0]
+        
+#         if writer_info[0] != None: 
+#             profile_icon = PhotoImage(file = writer_info[0])
+#         else:
+        profile_icon = PhotoImage(file = "test.png")
+            
+        profile = Label(w, image = profile_icon, width = 150, height = 150) 
+        if result[0] == id:     
+            writer_name = Button(w, state=DISABLED, text = writer_info[1].title(), font = ("맑은 고딕", 12, "bold"), fg = "dark blue", bg = "white", width = 8, command = friend_board_ui)
+        else:
+            writer_name = Button(w, text = writer_info[1].title(), font = ("맑은 고딕", 12, "bold"), fg = "dark blue", bg = "white", width = 8, command = friend_board_ui)
+        content = Text(w, width = 70, height = 5, font = ("맑은 고딕", 13))
+        content.insert(END, result[1])
+        
+        change_num = num[0] # 수정/삭제 번호
+        content_update = Button(w, text = "게시물 수정", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 8, command = friend_board_update_process)        
+        content_delete = Button(w, text = "게시물 삭제", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 8, command = friend_board_delete_process)
+        
+        profile.place(x = 30, y = y_value)
+        writer_name.place(x = 190, y = y_value)
+        content.place(x = 190, y = y_value+40)
+        if result[0] == id:
+            content_update.place(x = 660, y = y_value+170)
+        if result[0] == id:
+            content_delete.place(x = 745, y = y_value+170)
+        y_value += 205
+
+
+def friend_board_update_process():
+    global change_num, id, friend_id
+    friends = 'user2' # 임시로 친구 아이디 지정
+    new_content = content.get("1.0", 'end-1c')
+
+    cont_num = change_num 
+    
+    friend_content_update(cont_num, new_content)
+    
+    messagebox.showinfo("수정 완료", "게시물이 수정되었습니다.")
+
+def friend_board_delete_process():
+    global change_num
+    cont_num = change_num
+    
+    friend_content_delete(cont_num)
+    
+    messagebox.showinfo("삭제 완료", "게시물이 삭제되었습니다.")
