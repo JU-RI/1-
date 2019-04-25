@@ -1,0 +1,47 @@
+from pymysql import *
+
+def member_select(name):    #검색된 회원 목록
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = "facebook")
+    cur = con.cursor()
+    name = name.lower()
+
+    sql = """select id, profile, name, country, city from members where name = '%s' 
+    or country = '%s' or city = '%s'""" % (name, name, name)
+    cur.execute(sql)
+
+    record = list(cur.fetchall())
+
+    con.commit()
+    con.close()
+    return record
+
+
+def friends_select(id):  #친구 목록 출력
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "select * from friends where user1 = '%s' or user2 = '%s'" % (id, id)
+    cur.execute(sql)
+    
+    record = list(cur.fetchall())
+
+
+    con.commit()
+    con.close()
+    return record
+   
+    
+def friend_search(id1, id2):
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = "facebook")
+    cur = con.cursor()
+    sql = "select user1, user2 from friends where user1 = '%s' and user2 = '%s' or user1 = '%s' and user2 = '%s'" % (id1, id2, id2, id1)
+    cur.execute(sql)
+    
+    record = cur.fetchall()
+    
+    if record == None:
+        record = ""
+
+    con.commit()
+    con.close()
+    
+    return record
