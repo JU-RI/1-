@@ -1,0 +1,262 @@
+from tkinter import *
+from tkinter import messagebox
+from facebook.crud import *
+from facebook.friend_list_UI import *
+from facebook.friend_board_UI import friend_board_ui
+
+
+content_num_input, content_input = None, None
+record, result, name_input, country_input, city_input = None, None, None, None, None
+
+
+def insert_process():
+    global content_num, writer_id, content
+    contList = content_list()
+    contList2 = []
+    for r in range(len(contList)):      #content_num 생성
+        contList2.append(contList[r][0])
+        content_num = (max(contList2) + 1)
+    content = content_input.get("1.0", 'end-1c')
+    writer_id = id
+    print(content)
+    insert(content_num, writer_id, content)
+    print("< 게시물 등록 완료 >")
+
+
+def update_process():
+    global content_num, content
+    content_num = content_num_input.get("1.0", 'end-1c')
+    content = content_input.get("1.0", 'end-1c')
+    update(content_num, content)
+    messagebox.showinfo("수정 완료", "게시물이 수정되었습니다.")
+    
+    
+def delete_process():
+    global content_num
+    content_num = content_num_input.get("1.0", 'end-1c')
+    delete(content_num)
+    messagebox.showinfo("삭제 완료", "게시물이 삭제되었습니다.")
+
+
+def friend_list_process():    #친구 목록
+    global user1_id, record, result, id
+    user1_id = id
+    friList = friend_list(user1_id)
+    result = []
+    for i in range(len(friList)):
+        result.append(friList[i][0])
+        record = friendInfo(result[i])
+    friend_list_ui()
+    
+
+def button_process():
+    global record, friend_id
+     
+    memList = record
+    print(memList)
+    friend_name = board_input.get().lower()
+    for m in range(len(memList)):
+        if friend_name == memList[m][2].lower():
+            friend_id = friend_id_select(friend_name)[0]
+            friend_board_ui()
+            break
+
+        
+
+'''=============================================================================================='''
+
+
+def update_ui():
+    global content_num_input, content_input
+    w = Toplevel()
+    w.geometry("300x300+500+150")
+    w.title("게시물 수정")
+    w.configure(bg = "white")
+    
+    content_num_text = Label(w, text = "게시물 번호 입력", font = ("맑은 고딕", 10), fg = "black", bg = "white")
+    content_num_text.place(x = 100, y = 10)
+    content_text = Label(w, text = "수정할 게시물 내용 입력", font = ("맑은 고딕", 10), fg = "black", bg = "white")
+    content_text.place(x = 80, y = 70)
+    
+    content_num_input = Text(w, font = ("맑은 고딕", 12), fg = "black", bg = "white", width = 30, height = 1)
+    content_num_input.place(x = 13, y = 40)
+    content_input = Text(w, font = ("맑은 고딕", 12), fg = "black", bg = "white", width = 30, height = 7)
+    content_input.place(x = 13, y = 100) 
+    
+    button_y = Button(w, text = "수정", font = ("맑은 고딕", 10), fg = "white", bg = "blue", width = 7, command = update_process)
+    button_n = Button(w, text = "취소", font = ("맑은 고딕", 10), bg = "white", width = 7, command = quit)
+    button_y.place(x = 90, y = 260)
+    button_n.place(x = 160, y = 260)
+    
+    w.mainloop() 
+
+ 
+def delete_ui():         
+    global content_num_input
+    w = Toplevel()
+    w.geometry("300x150+500+150")
+    w.title("게시물 삭제")
+    w.configure(bg = "white")
+    
+    content_num_text = Label(w, text = "게시물 번호 입력", font = ("맑은 고딕", 10), fg = "black", bg = "white")
+    content_num_text.place(x = 100, y = 10)
+    content_num_input = Text(w, font = ("맑은 고딕", 12), fg = "black", bg = "white", width = 30, height = 2)
+    content_num_input.place(x = 13, y = 40)
+    
+    button_y = Button(w, text = "삭제", font = ("맑은 고딕", 10), fg = "white", bg = "red", width = 7, command = delete_process)
+    button_n = Button(w, text = "취소", font = ("맑은 고딕", 10), bg = "white", width = 7, command = quit)
+    button_y.place(x = 90, y = 100)
+    button_n.place(x = 160, y = 100)
+    
+    w. mainloop()
+ 
+    
+
+'''=============================================================================================='''
+    
+    
+def myBoard_ui(): #메인
+    global content_input, id, writer_id, board_input
+    w = Toplevel()
+    w.geometry("1000x700+250+50")
+    w.resizable(False, False)
+    w.title("내 게시판")
+    w.configure(bg = "white")
+    
+    logo_icon = PhotoImage(file = "web.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 15, y = 15)
+    
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 10), bg = "white", command = friend_list_process)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10), bg = "white", command = my_info_update_ui)
+    button1.place(x = 830, y = 15)
+    button2.place(x = 900, y = 15)
+    
+    
+    ### 검색
+    board_input = Entry(w, font = ("맑은 고딕", 15), fg = "black", bg = "white", width = 46)
+    board_input.place(x = 220, y = 100)
+    
+    board = Button(w, text = "검색", font = ("맑은 고딕", 10), fg = "black", bg = "white", width = 6, command = button_process)
+    board.place(x = 735, y = 100)
+    
+    
+    ### 내 정보 출력
+    id = '100'
+    info = myInfo(id)
+    infoList = []
+    for i in info:
+        infoList.append([i][0])
+    
+    profile_icon = PhotoImage(file = infoList[0])    #profile
+    profile = Label(w, image = profile_icon)
+    name = Label(w, text = infoList[1], font = ("맑은 고딕", 15), fg = "dark gray", width = 40)
+    birthday = Label(w, text = infoList[2], font = ("맑은 고딕", 15), fg = "dark gray", width = 40)
+    country_city = Label(w, text = infoList[3:5], font = ("맑은 고딕", 15), fg = "dark gray", width = 40)
+    
+    profile.place(x = 220, y = 150)
+    name.place(x = 340, y = 150)
+    birthday.place(x = 340, y = 184)
+    country_city.place(x = 340, y = 218)
+    
+    
+    ### 게시물 등록
+    content_input = Text(w, font = ("맑은 고딕", 12), fg = "black", bg = "white", width = 63, height = 4)
+    content_input.place(x = 217, y = 270)
+    
+    content_insert = Button(w, text = "등록", font = ("맑은 고딕", 10), fg = "white", bg = "blue", width = 6, command = insert_process)
+    content_insert.place(x = 793, y = 270)
+
+    
+    ### 게시물 목록 출력
+    contList = content_list()
+    contList2 = list(reversed(contList))    #역순으로 정렬
+        
+    y1 = 370
+    for r in range(len(contList2)):
+        id = contList2[r][1]
+        
+        writerInfo = list(wriInfo(id))
+        
+        profiles_icon = PhotoImage(file = writerInfo[0][0])
+        profiles = Label(w, image = profiles_icon, width = 80, height = 80)
+        conNums = Label(w, text = contList2[r][0], font = ("맑은 고딕", 10), fg = "gray", bg = "white", width = 5)
+        names = Label(w, text = writerInfo[0][1], font = ("맑은 고딕", 10), fg = "black", bg = "white",  width = 5)
+        contents = Label(w, text = contList2[r][2], font = ("맑은 고딕", 13), fg = "black", width = 45, height = 2)
+        
+        profiles.place(x = 230, y = y1)
+        conNums.place(x = 330, y = y1 + 3)
+        names.place(x = 370, y = y1)
+        contents.place(x = 330, y = y1 + 30)
+        
+                    
+        ### 게시물 수정, 삭제 버튼
+        content_update = Button(w, text = "수정", font = ("맑은 고딕", 8), fg = "blue", bg = "white", width = 6,
+                        command = update_ui)
+        content_update.place(x = 685, y = y1)
+        content_delete = Button(w, text = "삭제", font = ("맑은 고딕", 8), fg = "red", bg = "white", width = 6,
+                        command = delete_ui)
+        content_delete.place(x = 735, y = y1)
+        y1 += 90
+        
+    w.mainloop()
+
+
+
+'''=============================================================================================='''
+    
+    
+def friend_list_ui():   #친구 목록 보기
+    global select_input, user1_id, id, record, result
+    w = Toplevel()
+    w.geometry("1000x700")
+    w.title("친구 목록")
+    w.configure(bg = "white")
+    
+    logo_icon = PhotoImage(file = "web.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 15, y = 15)
+    
+    button1 = Button(w, text = "내 게시판", font = ("맑은 고딕", 10), bg = "white", command = myBoard_ui)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10), bg = "white", command = my_info_update_ui)
+    button1.place(x = 830, y = 15)
+    button2.place(x = 900, y = 15)
+    
+    
+    ### 검색
+    board_input = Entry(w, font = ("맑은 고딕", 15), fg = "black", bg = "white", width = 46)
+    board_input.place(x = 220, y = 100)
+    
+    board = Button(w, text = "검색", font = ("맑은 고딕", 10), fg = "black", bg = "white", width = 6, command = button_process)
+    board.place(x = 735, y = 100)
+    
+    user1_id = '100'
+    ### 친구 목록 출력 
+    friendList = friend_list(user1_id)
+    
+    y1 = 150
+    for id in friendList:
+        info = friendInfo(id[0])
+
+        for r in range(len(info)):
+            profile_icon = PhotoImage(file = info[r][0])
+            profile = Label(w, image = profile_icon, width = 90, height = 90)
+            name = Label(w, text = info[r][1], font = ("맑은 고딕", 14, "bold"), fg = "black", width = 20, height = 3)
+            birth = Label(w, text = info[r][2], font = ("맑은 고딕", 12), fg = "black", width = 26, height = 2)
+            country = Label(w, text = info[r][3], font = ("맑은 고딕", 12), fg = "black", width = 15, height = 2)
+            city = Label(w, text = info[r][4], font = ("맑은 고딕", 12), fg = "black", width = 15, height = 2)
+            
+            profile.place(x = 225, y = y1)
+            name.place(x = 330, y = y1)
+            birth.place(x = 540, y = y1 + 1)
+            country.place(x = 540, y = y1 + 44)
+            city.place(x = 639, y = y1 + 44)
+            y1 += 110
+
+    w.mainloop()
+
+
+    
+if __name__ == '__main__':
+    myBoard_ui()
+#     friend_list_ui()
