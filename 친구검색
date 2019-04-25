@@ -1,0 +1,38 @@
+##### crud 부분
+
+def friend_id_select(name):
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = "facebook")
+    cur = con.cursor()
+    sql = "select id from members where name = '%s'" % (name)
+    cur.execute(sql)
+    
+    record = cur.fetchone()
+    
+    con.commit()
+    con.close()
+    
+    return record
+    
+    
+
+### ui process 부분
+    
+def button_process():
+    global record, friend_id
+     
+    memList = record
+    print(memList)
+    friend_name = board_input.get().lower()
+    for m in range(len(memList)):
+        if friend_name == memList[m][2].lower():
+            friend_id = friend_id_select(friend_name)[0]
+            friend_board_ui2()
+            break
+#         elif friend_name != mem:
+#             messagebox.showerror("검색 오류", "일치하는 회원이 없습니다.")    
+    
+    
+    
+    
+    
+    
