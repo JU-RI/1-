@@ -5,94 +5,32 @@ from facebook.crud import *
 from facebook.ui import *
 
 # +더보기 기능
-record, result, name_input, country_input, city_input, user1_id_input = None, None, None, None, None, None
+record, result, name_input, country_input, city_input = None, None, None, None, None
 
-# def friend_insert_process():    #친구 추가
-#     global name
-#     name = name_input.get()
-#     print("< 친구 추가 완료 >")
-
-
-# def member_select_process():    #회원 검색
-#     global name, country, city, record
-#     name = select_input.get()
-#     country = select_input.get()
-#     city = select_input.get()
-#     
-# #     record = member_select()
-#     member_list = []
-#     
-#     for i in record:
-#         member_list.append([i][0])
-#          
-#     while True:                 
-#         if name or country or city not in member_list:
-#             messagebox.showerror("오류", "일치하는 회원이 없습니다.")        
-#             break
-#         else:
-#             update()
-#             print("< 검색된 회원 목록 출력 완료 >")
-#     member_select_ui(record)
+def friend_list_process():    #친구 목록
+    global user1_id, id, record, result
+    result = friend_list(user1_id)
+    record = friendInfo(result)
+    friend_list_ui(record, result)
     
     
-def friend_select_process():    #친구 목록
-    global user1_id, result
-    result = friend_select()
-    friend_list_ui(result)
-    
-    
-def go_board():
-    global id
-    result = select_all_id()
-    myBoard_ui(result)
+def go_process2():
+    global id, friend, user1_id
+    friList = friend_list()
+    print(friList)
+    id_list = []
+    for i in range(len(friList)):
+        id_list.append(friList[i])
+    print(id_list)
+    friend = id_list[i]
+    friend_board_ui()
     
 
 '''=============================================================================================='''
     
-'''
-def member_select_ui():     #검색된 회원 목록
-    global select_input
-    w = Toplevel()
-    w.geometry("1000x700")
-    w.title("회원 검색 결과")
-    w.configure(bg = "white")
-    
-    logo_icon = PhotoImage(file = "web.png")
-    logo = Label(w, image = logo_icon)
-    logo.place(x = 15, y = 15)
-    
-    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 10), command = friend_list_ui)
-    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10), command = my_info_update_ui)
-    button1.place(x = 830, y = 15)
-    button2.place(x = 900, y = 15)
-      
-    
-    ### 검색된 회원 목록 출력
-    memList = member_select()
-    print(memList)
-
-    for record in memList:
-        profiles_icon = PhotoImage(file = record[0])
-        profiles = Label(w, image = profiles_icon, width = 100, height = 100)
-        names = Label(w, text = record[1], font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 10)
-        countries = Label(w, text = record[2], font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 40)
-        cities = Label(w, text = record[3], font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 50)
-        
-        ### 친구 추가 버튼
-        fri_insert = Button(w, text = "등록", font = ("맑은 고딕", 10), fg = "white", bg = "blue", width = 6,
-                        command = friend_insert_process)
-        
-        profiles.place(x = 500, y = 500)
-        names.place(x = 500, y = 550)
-        countries.place(x = 500, y = 570)
-        cities.place(x = 500, y = 590)
-        fri_insert.place(x = 820, y = 300)
-
-    w.mainloop()
-'''
-
+     
 def friend_list_ui():   #친구 목록 보기
-    global select_input
+    global select_input, user1_id, id
     w = Toplevel()
     w.geometry("1000x700")
     w.title("친구 목록")
@@ -109,39 +47,37 @@ def friend_list_ui():   #친구 목록 보기
     
     
     ### 검색
-    select_input = Entry(w, font = ("맑은 고딕", 15), fg = "black", bg = "white", width = 46)
-    select_input.place(x = 220, y = 100)
+    board_input = Entry(w, font = ("맑은 고딕", 15), fg = "black", bg = "white", width = 46)
+    board_input.place(x = 220, y = 100)
     
-    select = Button(w, text = "검색", font = ("맑은 고딕", 10), fg = "black", bg = "white", width = 6)
+    board = Button(w, text = "검색", font = ("맑은 고딕", 10), fg = "black", bg = "white", width = 6)
                     # command = member_select_ui)
-    select.place(x = 735, y = 100)
+    board.place(x = 735, y = 100)
     
-    user1_id = '100'
+    
     ### 친구 목록 출력 
-    friendList = friend_select(user1_id)
-    print(friendList)
-    result = list(friendInfo(id))
-    print(result)
+    user1_id = id
+    friendList = friend_list(user1_id)
     
-    font = tkinter.font.Font(family = "맑은 고딕", size = 14, weight = "bold")
-    
-    y1 = 150
-    for r in range(len(friendList)):
-        profile_icon = PhotoImage(file = result[r][0])
-        profile = Label(w, image = profile_icon, width = 90, height = 90)
-        name = Button(w, text = result[r][1], font = font, fg = "black", width = 20, height = 3,
-                      command = go_board)
-        birth = Label(w, text = result[r][2], font = ("맑은 고딕", 12), fg = "black", width = 26, height = 2)
-        country = Label(w, text = result[r][3], font = ("맑은 고딕", 12), fg = "black", width = 15, height = 2)
-        city = Label(w, text = result[r][4], font = ("맑은 고딕", 12), fg = "black", width = 15, height = 2)
-        
-        profile.place(x = 225, y = y1)
-        name.place(x = 330, y = y1)
-        birth.place(x = 540, y = y1 + 1)
-        country.place(x = 540, y = y1 + 44)
-        city.place(x = 639, y = y1 + 44)
-        y1 += 110
-        
+    y1 = 150    
+    for id in friendList:
+        info = friendInfo(id[0])
+
+        for r in range(len(info)):
+            profile_icon = PhotoImage(file = info[r][0])
+            profile = Label(w, image = profile_icon, width = 90, height = 90)
+            name = Label(w, text = info[r][1], font = ("맑은 고딕", 14, "bold"), fg = "black", width = 20, height = 3)
+            birth = Label(w, text = info[r][2], font = ("맑은 고딕", 12), fg = "black", width = 26, height = 2)
+            country = Label(w, text = info[r][3], font = ("맑은 고딕", 12), fg = "black", width = 15, height = 2)
+            city = Label(w, text = info[r][4], font = ("맑은 고딕", 12), fg = "black", width = 15, height = 2)
+            
+            profile.place(x = 225, y = y1)
+            name.place(x = 330, y = y1)
+            birth.place(x = 540, y = y1 + 1)
+            country.place(x = 540, y = y1 + 44)
+            city.place(x = 639, y = y1 + 44)
+            y1 += 110
+
     w.mainloop()
     
 if __name__ == '__main__':
