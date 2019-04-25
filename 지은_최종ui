@@ -1,0 +1,984 @@
+from tkinter import *
+from crud import *
+from tkinter import messagebox
+from tkinter.filedialog import *
+# from tkinter.simpledialog import *
+from friend_board_crud import *
+from member_search_crud import *
+
+
+
+id_input, pw_input, name_input, join_id_input, join_pw_input, gender_input, birthday_input, country_input, city_input, photo_label, hobby_input, pw2_input, filename, var, my_id, w, content_input, friend_id = None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None
+id, friend_num, friend, select_entry, record, change_num, cont_num, board_input, id1, id2 = None,None,None, None, None, None, None, None, None, None
+# content1, content2, content3 = None, None, None
+def my_bulletin_ui():
+    pass
+
+def sign_in_process():
+    global id
+    id = id_input.get()
+    pw = pw_input.get()
+    
+    all_id = select_all_id() 
+    id_list = list() 
+    
+    for n in range(len(all_id)):
+        id_list.append(all_id[n][0])
+      
+    num = 0     
+    while True:                
+        if num == len(id_list):
+            messagebox.showerror("로그인 오류", "일치하는 회원이 없습니다.")        
+            break
+         
+        elif id == id_list[num]:
+            result = sign_in(id)
+          
+            if result[0] == pw:
+                my_info_update_ui()
+
+            else:
+                messagebox.showinfo("비밀번호 오류", "비밀번호가 틀렸습니다.") 
+            break
+         
+        else:
+            num += 1
+
+def sign_up_process():
+    id = join_id_input.get()
+    pw = join_pw_input.get()
+    name = name_input.get().lower()
+    gender = gender_input
+    birthday = birthday_input.get()
+    country = country_input.get().lower()
+    city = city_input.get().lower()
+    
+    all_id = list(select_all_id())
+    id_list = list()
+    
+    if all_id != []:
+        for n in range(len(all_id)):
+            id_list.append(all_id[n][0])
+    
+    num = len(id_list)
+    
+    if num != 0:
+        for n in range(len(id_list)+1):
+            if n <= len(id_list):
+                if id == "" or pw == "" or name == "" or gender == "" or birthday == "" or country == "" or city == "":
+                    messagebox.showinfo("회원가입 오류", "모든 칸을 입력하셔야 합니다.") 
+                    break
+    
+                if id == id_list[n]:
+                    messagebox.showerror("회원가입 오류", "이미 존재하는 아이디입니다.")
+                    break
+                  
+                if id != "" and pw != "" and name != "" and gender != "" and birthday != "" and country != "" and city != "":
+                    sign_up(id, pw, name, country, city, birthday, gender)
+                    friend_insert(id, id)
+                    messagebox.showinfo("회원가입 완료", "회원가입 완료!!")
+                    break
+    else:
+        if id == "" or pw == "" or name == "" or gender == "" or birthday == "" or country == "" or city == "":
+            messagebox.showinfo("회원가입 오류", "모든 칸을 입력하셔야 합니다.")
+        if id != "" and pw != "" and name != "" and gender != "" and birthday != "" and country != "" and city != "":
+                sign_up(id, pw, name, country, city, birthday, gender)
+                friend_insert(id, id)
+                messagebox.showinfo("회원가입 완료", "회원가입 완료!!")
+            
+                     
+     
+
+def my_info_update_process():
+    global join_id_input
+    pw = pw_input.get()
+    pw2 = pw2_input.get()
+    name = name_input.get().lower()
+    country = country_input.get().lower()
+    city = city_input.get().lower()
+    birthday = birthday_input.get()
+    hobby = hobby_input.get().lower()
+    profile = filename
+    gender = gender_input
+    
+    my_info = list(select_my_info(id))
+    if gender == None:
+        gender = int(my_info[6])
+      
+    item_list = [pw, pw2, name, country, city, birthday]
+  
+    n = 0
+    while True:
+        if item_list[n] != "":
+            n += 1
+            if n == 6:
+                if pw == pw2:
+                    my_info_update(id, pw, name, country, city, birthday, gender, hobby , profile)
+                    messagebox.showinfo("확인", "정보 수정 완료!!")
+                    break
+                else:
+                    messagebox.showerror("비밀번호 오류", "비밀번호가 일치하지 않습니다.")
+                    break
+      
+        else:
+            messagebox.showerror("회원 정보 수정 오류", "필수값(*)은 반드시 입력하셔야 합니다.")
+            break
+
+def delete_account_process():   
+    delete_account(id)
+    messagebox.showinfo("회원 탈퇴 완료", "회원 탈퇴가 완료되었습니다.")
+
+def gender_choice():
+    global gender_input
+    if var.get() == 1:
+        gender_input = "1"
+    elif var.get() == 2:
+        gender_input = "2"
+
+def friends_process():
+    pass
+
+def delete_account_ui():
+    w = Tk()
+    w.title("회원 탈퇴")
+    w.geometry("240x110")
+    
+    delete_label = Label(w, font = ("맑은 고딕", 12), text = "정말로 탈퇴하시겠습니까?", fg = "dark blue")
+    yes_btn = Button(w, text = "예", width = 5, font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = delete_account_process)
+    no_btn = Button(w, text = "아니오", width = 5, font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = cancel_ui)
+    
+    delete_label.place(x = 25, y = 10)
+    yes_btn.place(x = 60, y = 60)
+    no_btn.place(x = 130, y = 60)
+
+    w.mainloop()
+
+def cancel_ui():    
+    messagebox.showinfo("취소", "취소되었습니다.")
+
+def mainpage_ui():
+    global var, id_input, pw_input, name_input, join_id_input, join_pw_input, birthday_input, country_input, city_input
+    w = Tk()
+    w.title("facebook 메인페이지")
+    w.geometry("1200x800")
+    
+    login_id = Label(w, text = "아이디", font = ("맑은 고딕", 15), fg = "dark blue")
+    login_pw = Label(w, text = "패스워드", font = ("맑은 고딕", 15), fg = "dark blue")
+    id_input = Entry(w, font = ("맑은 고딕", 15), width = 15)
+    pw_input = Entry(w, font = ("맑은 고딕", 15), width = 15)
+    login = Button(w, text="로그인", font = ("맑은 고딕", 13, "bold"), fg = "white", bg = "dark blue", command = sign_in_process)
+    join = Button(w, text="회원가입", font = ("맑은 고딕", 15, "bold"), fg = "white", bg = "dark blue", command = sign_up_process)
+
+    join_label = Label(w, text="회원가입", font = ("맑은 고딕", 20), fg = "dark blue")  
+    join_name = Label(w, text = "이름", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_id = Label(w, text = "아이디", font = ("맑은 고딕", 12), fg = "dark blue") 
+    id_notice = Label(w, text = "(아이디: 1 ~ 10자리) ", font = ("맑은 고딕", 11), fg = "dark blue")
+#     join_id_info = Label(w, text = "", bg = "pink")
+    join_pw = Label(w, text = "패스워드", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_gender = Label(w, text = "성별", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_birthday = Label(w, text = "생일", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_country = Label(w, text = "국가", font = ("맑은 고딕", 12), fg = "dark blue") 
+    join_city = Label(w, text = "도시", font = ("맑은 고딕", 12), fg = "dark blue") 
+
+    name_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    join_id_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    join_pw_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    var = IntVar()
+    gender_input1 = Radiobutton(w, text="남", variable = var, value = 1, font = ("맑은 고딕", 13), fg= "dark blue", command = gender_choice)
+    gender_input2 = Radiobutton(w, text="여", variable = var, value = 2, font = ("맑은 고딕", 13), fg= "dark blue", command = gender_choice)
+
+    birthday_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    country_input = Entry(w, font = ("맑은 고딕", 13), width = 20)
+    city_input = Entry(w, font = ("맑은 고딕", 13), width = 20)   
+ 
+    icon1 = PhotoImage(file="logo.png")
+    pic1 = Label(w)
+    pic1.configure(image=icon1)
+    pic1.image = icon1
+    
+    icon2 = PhotoImage(file="main.png")
+    pic2 = Label(w)
+    pic2.configure(image=icon2)
+    pic2.image = icon2    
+
+         
+    pic1.place(x = 0, y = 0)
+    login_id.place(x = 580, y = 20)
+    id_input.place(x = 660, y = 20)
+    login_pw.place(x = 840, y = 20)
+    pw_input.place(x = 935, y = 20)
+    login.place(x = 1120, y = 15)
+    pic2.place(x = 10, y = 180)
+    
+    join_label.place(x = 840, y = 150)      
+   
+    join_name.place(x = 755, y = 250)     
+    name_input.place(x = 830, y = 250)   
+  
+    join_id.place(x = 755, y = 295)
+    join_id_input.place(x = 830, y = 295)
+    id_notice.place(x = 1020, y = 295)
+#     join_id_info.place(x = 900, y = 285)     
+   
+    join_pw.place(x = 755, y = 340)
+    join_pw_input.place(x = 830, y = 340)
+ 
+    join_gender.place(x = 755, y = 385)         
+    gender_input1.place(x = 850, y = 385)    
+    gender_input2.place(x = 930, y = 385)    
+   
+    join_birthday.place(x = 755, y = 430)
+    birthday_input.place(x = 830, y = 430)     
+   
+    join_country.place(x = 755, y = 475)
+    country_input.place(x = 830, y = 475)
+      
+    join_city.place(x = 755, y = 520)    
+    city_input.place(x = 830, y = 520)
+         
+    join.place(x = 855, y = 580)
+ 
+   
+    w.mainloop()
+       
+def my_info_update_ui():
+    global id, w, photo_label, pw_input, pw2_input, name_input, country_input, city_input, birthday_input, var, hobby_input
+    w = Toplevel()
+    w.title("facebook 회원정보 수정 페이지")
+    w.geometry("840x650") 
+          
+    my_info = list(select_my_info(id))           
+
+    icon = PhotoImage(file="logo.png")
+    pic = Label(w)
+    pic.configure(image=icon)
+    pic.image = icon
+    
+    my_bulletin = Button(w, text="내 게시판", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = friend_board_ui)
+    friend_mngt = Button(w, text="친구 관리", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", command = member_select_ui)
+       
+    pic_label = Label(w, text = "프로필 사진 수정", font = ("맑은 고딕", 12, "bold"), fg = "dark blue")
+    photo = PhotoImage(file = "default.png")
+    photo_label = Label(w, image = photo, width = 150, height = 150)    
+    pic_button = Button(w, text = "찾아보기", command = pic_choice_ui, fg = "white", bg = "dark blue", font = ("맑은 고딕", 10, "bold"))
+    
+    if my_info[7] != 'None' and my_info[7] != 'NULL':
+        photo2 = PhotoImage(file = my_info[7])
+        original_photo = Label(w, image = photo2, width = 150, height = 150)
+        original_photo.configure(image = photo2)
+        original_photo.image = photo2
+        
+    id_label = Label(w, text = "아이디", font = ("맑은 고딕", 11), fg = "dark blue")
+    pw_label = Label(w, text = "비밀번호(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    pw2_label = Label(w, text = "비밀번호 확인(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    name_label = Label(w, text = "이름(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    country_label = Label(w, text = "국가(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    city_label = Label(w, text = "도시(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    birthday_label = Label(w, text = "생일(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    gender_label = Label(w, text = "성별(*)", font = ("맑은 고딕", 11), fg = "dark blue")
+    hobby_label = Label(w, text = "취미", font = ("맑은 고딕", 11), fg = "dark blue")
+    
+    
+    id_var = StringVar(w, value = my_info[0])
+    id_input = Entry(w, textvariable = id_var, state=DISABLED, font = ("맑은 고딕", 13), bg = "grey", width = 15)
+    pw_var = StringVar(w, value = my_info[1])
+    pw_input = Entry(w, textvariable = pw_var, font = ("맑은 고딕", 13), width = 15)
+    pw2_input = Entry(w, textvariable = pw_var, font = ("맑은 고딕", 13), width = 15)
+    name_var = StringVar(w, value = my_info[2].title())
+    name_input = Entry(w, textvariable = name_var, font = ("맑은 고딕", 13), width = 15)
+    country_var = StringVar(w, value = my_info[3].title())
+    country_input = Entry(w, textvariable = country_var, font = ("맑은 고딕", 13), width = 15)
+    city_var = StringVar(w, value = my_info[4].title())
+    city_input = Entry(w, textvariable = city_var, font = ("맑은 고딕", 13), width = 15)
+    birthday_var = StringVar(w, value = my_info[5])
+    birthday_input = Entry(w, textvariable = birthday_var, font = ("맑은 고딕", 13), width = 15)
+    
+    var = IntVar(w, value = int(my_info[6]))
+
+    gender_input1 = Radiobutton(w, text="남", variable = var, value = 1, font = ("맑은 고딕", 13), fg= "dark blue", command = gender_choice)
+    gender_input2 = Radiobutton(w, text="여", variable = var, value = 2, font = ("맑은 고딕", 13), fg= "dark blue", command = gender_choice)
+    
+    if my_info[8] != NULL:
+        hobby_var = StringVar(w, value = my_info[8])
+    else:
+        hobby_var = StringVar()
+
+    hobby_input = Entry(w, textvariable = hobby_var, font = ("맑은 고딕", 13), width = 15)
+   
+    update = Button(w, text = "수정", bg = "dark blue", fg = "white", font = ("맑은 고딕", 10, "bold"), command = my_info_update_process)  
+    cancel = Button(w, text = "취소", bg = "dark blue", fg = "white", font = ("맑은 고딕", 10, "bold"), command = quit)
+    delete = Button(w, text = "회원탈퇴", bg = "dark blue", fg = "white", font = ("맑은 고딕", 13, "bold"), command = delete_account_ui) 
+    logout = Button(w, text = "로그아웃", bg = "dark blue", fg = "white", font = ("맑은 고딕", 13, "bold"), command = quit)        
+    
+    pic.place(x = 3, y = 3)
+
+    my_bulletin.place(x=20, y = 200)
+    friend_mngt.place(x=20, y = 250)
+
+    pic_label.place(x=200, y = 190)
+    photo_label.place(x=190, y = 230)
+    if my_info[7] != 'None' and my_info[7] != 'NULL':
+        original_photo.place(x=190, y = 230)
+    pic_button.place(x=232, y = 400)
+     
+    id_label.place(x=410, y = 150)
+    id_input.place(x=560, y = 150)
+    pw_label.place(x=410, y = 190)
+    pw_input.place(x=560, y = 190)
+    pw2_label.place(x=410, y = 230)
+    pw2_input.place(x=560, y = 230)
+    
+    name_label.place(x=410, y = 270)
+    name_input.place(x=560, y = 270)
+    country_label.place(x=410, y = 310)
+    country_input.place(x=560, y = 310)
+    city_label.place(x=410, y = 350)
+    city_input.place(x=560, y = 350)
+    birthday_label.place(x=410, y = 390)
+    birthday_input.place(x=560, y = 390)
+    gender_label.place(x=410, y = 430)
+    gender_input1.place(x=570, y = 430)
+    gender_input2.place(x=640, y = 430)
+    hobby_label.place(x=410, y = 470)
+    hobby_input.place(x=560, y = 470)
+     
+    update.place(x=370, y = 550)
+    cancel.place(x=420, y = 550)
+    delete.place(x=620, y = 10)
+    logout.place(x=710, y = 10)
+       
+    w.mainloop()
+    
+def pic_choice_ui():   
+    global filename
+    filename = askopenfilename(parent = w, filetypes = (("PNG 파일", "*.png"), ("JPG 파일", "*.jpg")))
+    photo = PhotoImage(file = filename)
+    photo_label.configure(image = photo)
+    photo_label.image = photo
+
+  
+def friend_board_ui():
+    global id, id1, id2, content_input, friend_id, friend_num, select_entry, cont_num, content1, content2, content3, friend
+    
+    w = Toplevel()
+    w.geometry("900x1100")
+    w.title("친구 게시판")
+    w.configure()
+     
+    logo_icon = PhotoImage(file = "logo.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 15, y = 5)
+     
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 13, "bold"), fg = "dark blue", width = 10, command = quit)#friend_list_process)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 8, command = my_info_update_ui)
+    button3 = Button(w, text = "로그아웃", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 8, command = quit)
+    button4 = Button(w, text = "내 게시판", font = ("맑은 고딕", 13, "bold"), fg = "dark blue", width = 10, command = quit)
+    
+    button1.place(x = 20, y = 300)
+    button2.place(x = 690, y = 15)
+    button3.place(x = 770, y = 15)
+    button4.place(x = 20, y = 350)
+    
+    select_entry = Entry(w, font = ("맑은 고딕", 13), fg = "dark blue", width = 60)
+    select = Button(w, text = "회원정보검색", font = ("맑은 고딕", 11, "bold"), fg = "white", bg = "dark blue", width = 10, command = member_select_process)
+    select_entry.place(x = 200, y = 115)
+    select.place(x = 770, y = 109)
+ 
+    ### 게시판 주인 정보 출력
+    friend = id # 추후 친구 아이디로 변경
+    info = list(friend_info(friend))
+    infoList = []
+    for i in info:
+        infoList.append([i][0])
+    
+    if infoList[7] == None or infoList[7] == "NULL":
+        infoList[7] = "default.png"
+        
+    id1 = id
+    id2 = id
+    friend_num = friend_select(id1, id2)
+        
+    iconfinal = PhotoImage(file = infoList[7], width=150, height=150)
+    profile2 = Label(w, image = iconfinal)
+    
+    name = Label(w, text = infoList[2].title(), font = ("맑은 고딕", 15), fg = "dark blue")
+    birthday = Label(w, text = infoList[5], font = ("맑은 고딕", 15), fg = "dark blue")
+    country = Label(w, text = infoList[3].title(), font = ("맑은 고딕", 15), fg = "dark blue")
+    city = Label(w, text = infoList[4].title(), font = ("맑은 고딕", 15), fg = "dark blue")
+    friend_add = Button(w, text="친구추가", font = ("맑은 고딕", 13, "bold"), fg = "white", width = 8, bg = "dark blue", command = friend_insert_process)
+    friend_label = Button(w, text="친구", state=DISABLED, font = ("맑은 고딕", 13, "bold"), fg = "dark blue", bg = "light gray", width = 8)
+        
+    profile2.place(x = 270 , y = 160)
+    name.place(x = 510, y = 160)
+    birthday.place(x = 510, y = 194)
+    country.place(x = 500, y = 228)
+    city.place(x = 550, y = 228)
+    
+    if friend_num != "":
+        if id1 != id2:
+            friend_label.place(x = 700, y = 180)
+    if friend_num == "":
+        friend_add.place(x = 700, y = 180)
+
+      
+    ### 게시물 등록
+    content_label = Label(w, text = "친구에게 어떤 말을 하고 싶은가요?(200자 이내로 적어주세요)", font = ("맑은 고딕", 13), fg = "dark blue")
+    content_input = Text(w, font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 70, height = 5)
+    content_label.place(x = 210, y = 310)
+    content_input.place(x = 210, y = 340)
+ 
+    insert = Button(w, text = "등록", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 6, command = content_insert_process)
+    insert.place(x = 765, y = 465)
+ 
+ 
+    ### 게시물 목록 출력 및 수정/삭제
+    if friend == None:
+        friend = id
+    cont_num = content_num(friend)
+    if cont_num != []:
+        con_list = []   
+        y_value = 530
+        for num in cont_num: # num: 컨텐츠 번호
+            result = content_select(num[0]) # 작성자 아이디, 게시물 내용
+            writer_info = writer_info_select(result[0]) # 작성자 프로필, 이름
+            con_list.append(result[1])
+            if result[0] == id:     
+                writer_name = Button(w, state=DISABLED, text = writer_info[1].title(), font = ("맑은 고딕", 12, "bold"), fg = "dark blue", bg = "white", width = 10, command = friend_board_ui2)
+            else:
+                friend = result[0] # 친구ui2에서 사용
+                writer_name = Label(w, text = writer_info[1].title(), font = ("맑은 고딕", 12, "bold"), fg = "dark blue")#, bg = "white")#, width = 10, command = friend_board_ui2)
+            writer_name.place(x = 220, y = y_value-5)
+            y_value += 205        
+     
+        content_update1 = Button(w, text = "게시물 수정", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_update_process1)        
+        content_delete1 = Button(w, text = "게시물 삭제", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_delete_process1)
+    
+        content_update2 = Button(w, text = "게시물 수정", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_update_process2)        
+        content_delete2 = Button(w, text = "게시물 삭제", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_delete_process2)
+        
+        content_update3 = Button(w, text = "게시물 수정", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_update_process3)        
+        content_delete3 = Button(w, text = "게시물 삭제", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_delete_process3)
+            
+        c_num = len(cont_num)-1
+        n = 0
+        
+        while True:
+            if n <= c_num:
+                content1 = Text(w, width = 70, height = 5, font = ("맑은 고딕", 13), bg = "light grey")
+                content1.insert(END, con_list[0])
+                content1.place(x = 220, y = 570)
+                if result[0] == id:
+                    content_update1.place(x = 660, y = 700) # 170 더함
+                if result[0] == id:
+                    content_delete1.place(x = 750, y = 700)            
+                n += 1
+                
+                if n <= c_num:
+                    content2 = Text(w, width = 70, height = 5, font = ("맑은 고딕", 13), bg = "light grey")
+                    content2.insert(END, con_list[1])
+                    content2.place(x = 220, y = 775)
+                    if result[0] == id:
+                        content_update2.place(x = 660, y = 905) 
+                    if result[0] == id:
+                        content_delete2.place(x = 750, y = 905)                    
+                    n += 1
+                    
+                if n <= c_num:
+                    content3 = Text(w, width = 70, height = 5, font = ("맑은 고딕", 13), bg = "light grey")
+                    content3.insert(END, con_list[2])
+                    content3.place(x = 220, y = 980)
+                    if result[0] == id:
+                        content_update3.place(x = 660, y = 1110) 
+                    if result[0] == id:
+                        content_delete3.place(x = 750, y = 1110)
+                    n += 1
+                    break
+                    
+                elif n > c_num:
+                    break    
+            
+        imglist = []
+        for num in cont_num:
+            result = content_select(num[0]) # 작성자 아이디, 게시물 내용
+            writer_info = writer_info_select(result[0]) # 작성자 프로필, 이름
+            
+            if writer_info[0] == "NULL" or writer_info[0] == "None": 
+                profile_icon = "default.png"
+            else:
+                profile_icon = writer_info[0]
+                        
+            imglist.append(profile_icon) 
+        
+        icon1 = PhotoImage(file=imglist[0])
+        icon2 = PhotoImage(file=imglist[1])
+        icon3 = PhotoImage(file=imglist[2])
+    
+        i1 = Label(w, image = icon1, width = 120, height = 120)
+        i1.place(x = 55, y = 545)
+        i2 = Label(w, image = icon2, width = 120, height = 120)
+        i2.place(x= 55, y = 750)
+        i3 = Label(w, image = icon3, width = 120, height = 120)
+        i3.place(x= 55, y = 955)
+
+        
+    w.mainloop()
+
+def friend_board_update_process1():
+    global friend, id, friend_id, content
+    
+    if friend == None:
+        friends = friend_id
+    elif friend_id == None:
+        friends = friend
+    else:
+        friends = id
+        
+    cont_num = content_num(friends)
+           
+    change_num = cont_num[0][0]
+        
+    new_content = content1.get("1.0", 'end-1c') 
+    friend_content_update(change_num, new_content)   
+    messagebox.showinfo("수정 완료", "게시물이 수정되었습니다.")
+
+def friend_board_update_process2():
+    global friend, id, friend_id, content
+    
+    if friend == None:
+        friends = friend_id
+    elif friend_id == None:
+        friends = friend
+    else:
+        friends = id
+        
+    cont_num = content_num(friends)
+           
+    change_num = cont_num[1][0]
+        
+    new_content = content2.get("1.0", 'end-1c')
+    print(change_num)
+    print(type(change_num))
+    friend_content_update(change_num, new_content)
+    
+    messagebox.showinfo("수정 완료", "게시물이 수정되었습니다.")
+
+def friend_board_update_process3():
+    global friend, id, friend_id, content
+    
+    if friend == None:
+        friends = friend_id
+    elif friend_id == None:
+        friends = friend
+    else:
+        friends = id
+        
+    cont_num = content_num(friends)
+           
+    change_num = cont_num[2][0]
+        
+    new_content = content3.get("1.0", 'end-1c')
+    friend_content_update(change_num, new_content)
+    
+    messagebox.showinfo("수정 완료", "게시물이 수정되었습니다.")
+
+def friend_board_delete_process1():
+    global friend, friend_id, id
+    
+    if friend == None:
+        friends = friend_id
+    elif friend_id == None:
+        friends = friend
+    else:
+        friends = id
+        
+    cont_num = content_num(friends)
+           
+    change_num = cont_num[0][0]
+    
+    friend_content_delete(change_num)
+    
+    messagebox.showinfo("삭제 완료", "게시물이 삭제되었습니다.")
+
+def friend_board_delete_process2():
+    global friend, friend_id, id
+    
+    if friend == None:
+        friends = friend_id
+    elif friend_id == None:
+        friends = friend
+    else:
+        friends = id
+        
+    cont_num = content_num(friends)
+           
+    change_num = cont_num[1][0]
+    
+    friend_content_delete(change_num)
+    
+    messagebox.showinfo("삭제 완료", "게시물이 삭제되었습니다.")
+    
+def friend_board_delete_process3():
+    global friend, friend_id, id
+    
+    if friend == None:
+        friends = friend_id
+    elif friend_id == None:
+        friends = friend
+    else:
+        friends = id
+        
+    cont_num = content_num(friends)
+           
+    change_num = cont_num[2][0]
+    
+    friend_content_delete(change_num)
+    
+    messagebox.showinfo("삭제 완료", "게시물이 삭제되었습니다.")
+    
+def friend_board_ui2():
+    global content_input, friend_id, friend_num, id1, id2, select_entry, change_num, content1, content2, content3
+        
+    w = Toplevel()
+    w.geometry("900x1100")
+    w.title("친구 게시판")
+    w.configure()
+     
+    logo_icon = PhotoImage(file = "logo.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 15, y = 5)
+     
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 13, "bold"), fg = "dark blue", width = 10, command = quit)#friend_list_process)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 8, command = my_info_update_ui)
+    button3 = Button(w, text = "로그아웃", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 8, command = quit)
+    button4 = Button(w, text = "내 게시판", font = ("맑은 고딕", 13, "bold"), fg = "dark blue", width = 10, command = quit)
+    
+    button1.place(x = 20, y = 300)
+    button2.place(x = 690, y = 15)
+    button3.place(x = 770, y = 15)
+    button4.place(x = 20, y = 350)
+    
+    select_entry = Entry(w, font = ("맑은 고딕", 13), fg = "dark blue", width = 60)
+    select = Button(w, text = "회원정보검색", font = ("맑은 고딕", 11, "bold"), fg = "white", bg = "dark blue", width = 10, command = member_select_process)
+    select_entry.place(x = 200, y = 115)
+    select.place(x = 770, y = 109)
+ 
+    ### 게시판 주인 정보 출력   
+    fid = friend_id # 게시판 주인인 친구 아이디임
+    info = list(friend_info(fid))
+    infoList = []
+    for i in info:
+        infoList.append([i][0])
+    
+    if infoList[7] == "None" or infoList[7] == "NULL":
+        infoList[7] = "default.png" 
+        
+    id1 = id
+    id2 = id
+    friend_num = friend_select(id, fid)
+        
+    iconfinal = PhotoImage(file = infoList[7], width=150, height=150)
+    profile2 = Label(w, image = iconfinal)
+    
+    name = Label(w, text = infoList[2].title(), font = ("맑은 고딕", 15), fg = "dark blue")
+    birthday = Label(w, text = infoList[5], font = ("맑은 고딕", 15), fg = "dark blue")
+    country = Label(w, text = infoList[3].title(), font = ("맑은 고딕", 15), fg = "dark blue")
+    city = Label(w, text = infoList[4].title(), font = ("맑은 고딕", 15), fg = "dark blue")
+    friend_add = Button(w, text="친구추가", font = ("맑은 고딕", 13, "bold"), fg = "white", width = 8, bg = "dark blue", command = friend_insert_process)
+    friend_label = Button(w, text="친구", state=DISABLED, font = ("맑은 고딕", 13, "bold"), fg = "dark blue", bg = "light gray", width = 8)
+       
+    profile2.place(x = 270 , y = 160)
+    name.place(x = 510, y = 160)
+    birthday.place(x = 510, y = 194)
+    country.place(x = 500, y = 228)
+    city.place(x = 550, y = 228)
+
+   
+    if fid != id:
+        if friend_num != "":
+            friend_label.place(x = 700, y = 180)
+        if friend_num == "":
+            friend_add.place(x = 700, y = 180)
+
+      
+    ### 게시물 등록
+    content_label = Label(w, text = "친구에게 어떤 말을 하고 싶은가요?(200자 이내로 적어주세요)", font = ("맑은 고딕", 13), fg = "dark blue")
+    content_input = Text(w, font = ("맑은 고딕", 13), fg = "black", bg = "white", width = 70, height = 5)
+    content_label.place(x = 210, y = 310)
+    content_input.place(x = 210, y = 340)
+ 
+    insert = Button(w, text = "등록", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 6, command = content_insert_process)
+    insert.place(x = 765, y = 465)
+
+
+    ### 게시물 목록 출력 및 수정/삭제
+    cont_num = content_num(fid)
+    
+    if cont_num != []:
+    
+        con_list = [] 
+        id_list = []  
+        y_value = 530
+        for num in cont_num: # num: 컨텐츠 번호
+            result = content_select(num[0]) # 작성자 아이디, 게시물 내용
+            writer_info = writer_info_select(result[0]) # 작성자 프로필, 이름
+            id_list.append(result[0])
+            con_list.append(result[1])
+            if result[0] == id:     
+                writer_name = Button(w, state=DISABLED, text = writer_info[1].title(), font = ("맑은 고딕", 12, "bold"), fg = "dark blue", bg = "white", width = 10, command = friend_board_ui2)
+            else:
+                writer_name = Label(w, text = writer_info[1].title(), font = ("맑은 고딕", 12, "bold"), fg = "dark blue")#, width = 10, command = friend_board_ui2)
+            writer_name.place(x = 220, y = y_value-5)
+            y_value += 205        
+     
+        content_update1 = Button(w, text = "게시물 수정", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_update_process1)        
+        content_delete1 = Button(w, text = "게시물 삭제", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_delete_process1)
+    
+        content_update2 = Button(w, text = "게시물 수정", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_update_process2)        
+        content_delete2 = Button(w, text = "게시물 삭제", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_delete_process2)
+        
+        content_update3 = Button(w, text = "게시물 수정", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_update_process3)        
+        content_delete3 = Button(w, text = "게시물 삭제", font = ("맑은 고딕", 10, "bold"), fg = "white", bg = "dark blue", width = 9, command = friend_board_delete_process3)
+            
+        c_num = len(cont_num)-1
+        n = 0
+        
+        
+        if id_list[0] == id:
+            content_update1.place(x = 660, y = 700) # 170 더함
+            content_delete1.place(x = 750, y = 700)
+        
+        if id_list[1] == id:
+            content_update2.place(x = 660, y = 905) 
+            content_delete2.place(x = 750, y = 905)
+        
+        if id_list[2] == id:
+            content_update3.place(x = 660, y = 1110) 
+            content_delete3.place(x = 750, y = 1110)
+                
+        while True:
+            if n <= c_num:
+                content1 = Text(w, width = 70, height = 5, font = ("맑은 고딕", 13), bg = "light grey")
+                content1.insert(END, con_list[0])
+                content1.place(x = 220, y = 570)            
+                n += 1
+                
+                if n <= c_num:
+                    content2 = Text(w, width = 70, height = 5, font = ("맑은 고딕", 13), bg = "light grey")
+                    content2.insert(END, con_list[1])
+                    content2.place(x = 220, y = 775)                    
+                    n += 1
+                    
+                if n <= c_num:
+                    content3 = Text(w, width = 70, height = 5, font = ("맑은 고딕", 13), bg = "light grey")
+                    content3.insert(END, con_list[2])
+                    content3.place(x = 220, y = 980)
+                    n += 1
+                    break
+                    
+                elif n > c_num:
+                    break    
+            
+        imglist = []
+        for num in cont_num:
+            result = content_select(num[0]) # 작성자 아이디, 게시물 내용
+            writer_info = writer_info_select(result[0]) # 작성자 프로필, 이름
+            
+            if writer_info[0] == "NULL" or writer_info[0] == "None": 
+                profile_icon = "default.png"
+            else:
+                profile_icon = writer_info[0]
+                        
+            imglist.append(profile_icon) 
+        
+        icon1 = PhotoImage(file=imglist[0])
+        icon2 = PhotoImage(file=imglist[1])
+        icon3 = PhotoImage(file=imglist[2])
+    
+        i1 = Label(w, image = icon1, width = 120, height = 120)
+        i1.place(x = 55, y = 545)
+        i2 = Label(w, image = icon2, width = 120, height = 120)
+        i2.place(x= 55, y = 750)
+        i3 = Label(w, image = icon3, width = 120, height = 120)
+        i3.place(x= 55, y = 955)
+    
+            
+    w.mainloop()
+            
+    
+def friend_insert_process(): # 친구 등록           
+    global id, friend_id
+    
+    if friend_id == None:
+        friend_insert(id, id)
+    else:
+        friend_insert(id, friend_id)
+        messagebox.showinfo("등록 완료", "친구 등록이 완료되었습니다.")
+
+def content_insert_process():
+    global id, friend_id, friend_num
+
+    content = content_input.get("1.0", 'end-1c')
+    content_num = content_number()[0] + 1
+    
+    if friend_id != None:
+        friend_num = friend_select(id, friend_id)
+    else:
+        friend_id = id
+        friend_num = friend_select(id, friend_id)
+    
+    if friend_num != "":
+        if content == "":
+            messagebox.showerror("오류", "내용을 입력해 주세요.")
+
+        else:
+            content_insert(content_num, friend_num, id, friend_id, content)
+            messagebox.showinfo("등록 완료", "게시물 등록이 완료되었습니다.")
+    else:
+        messagebox.showerror("오류", "친구만 게시물을 등록할 수 있습니다.")
+        
+###  <<< 회원 검색 >>>
+def member_select_process():    #회원 검색
+    global record, id
+    name = select_entry.get().lower()
+ 
+    record = member_select(name)
+    if record == []:   
+        messagebox.showerror("검색 오류", "정보와 일치하는 회원이 없습니다.")
+    else:
+        member_select_ui()   
+
+
+def member_select_ui():
+    global select_entry, select_input, record, friend_num, id, friend_id, friend, board_input
+    w = Toplevel()
+    w.geometry("1000x1100")
+    w.title("회원 검색 결과")
+    w.configure()
+
+    logo_icon = PhotoImage(file = "logo.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 5, y = 15)
+
+    board_label =  Label(w, text="게시판 이동할 회원 이름 입력:", font = ("맑은 고딕", 13, "bold"), fg = "dark blue")
+    board_input = Entry(w, font = ("맑은 고딕", 15), fg = "dark blue", width = 35)
+    board = Button(w, text = "이동", font = ("맑은 고딕", 13, "bold"), width = 6, fg = "white", bg = "dark blue", command = button_process)
+    
+    button1 = Button(w, text = "친구보기", font = ("맑은 고딕", 11, "bold"), width = 8, fg = "white", bg = "dark blue", command = friend_list_ui)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 11, "bold"), width = 8, fg = "white", bg = "dark blue", command = my_info_update_ui)
+    button1.place(x = 760, y = 15)
+    button2.place(x = 850, y = 15)
+    board_label.place(x = 150, y = 110)
+    board_input.place(x = 400, y = 110)
+    board.place(x = 800, y = 105)
+
+    ### 검색된 회원 목록
+    memList = record
+        
+# profile, name, country, city
+    x_value = 180
+    y_value = 190
+    imglist = []
+    idlist = []
+
+    for m in range(len(memList)):
+
+        if record[m][1] != None and record[m][1] != 'None' and record[m][1] != 'NULL': 
+            imglist.append(record[m][1])
+        else:
+            imglist.append("default.png")
+        idlist.append(record[m][0])
+
+
+        names = Label(w, text = "이름:  %s" % record[m][2].title(), font = ("맑은 고딕", 13, "bold"), fg = "dark blue")
+        countries = Label(w, text = "국가:  %s" % record[m][3].title(), font = ("맑은 고딕", 13, "bold"), fg = "dark blue")
+        cities = Label(w, text = "도시:  %s" % record[m][4].title(), font = ("맑은 고딕", 13, "bold"), fg = "dark blue")
+             
+        names.place(x= 350, y = y_value)
+        countries.place(x= 350, y = (y_value+50))
+        cities.place(x= 350, y = (y_value+100))
+        
+        y_value += 180
+        
+
+    searchlist = []
+    for i in idlist:
+        searchlist.append(friend_search(id, i))
+    
+    z = 60
+    for i in range(len(idlist)):
+        z += 180    
+        if idlist[i] != id:
+            if searchlist[i] != (): 
+                friend_label = Label(w, text="친구", font = ("맑은 고딕", 15, "bold"), fg = "dark blue", bg = "light gray", width = 7)
+                friend_label.place(x = 720, y = z)   
+            else:
+                friend_add = Button(w, text="친구추가", font = ("맑은 고딕", 12, "bold"), fg = "white", width = 8, bg = "dark blue", command = friend_insert_process)
+                friend_add.place(x = 720, y = z)
+                   
+            
+    icon1 = PhotoImage(file=imglist[0])
+    icon2 = PhotoImage(file=imglist[1])
+    icon3 = PhotoImage(file=imglist[2])
+    icon4 = PhotoImage(file=imglist[3])
+    icon5 = PhotoImage(file=imglist[4])
+    i1 = Label(w, image = icon1, width = 120, height = 120)
+    i1.place(x= 180, y = 190)
+    i2 = Label(w, image = icon2, width = 120, height = 120)
+    i2.place(x= 180, y = 370)
+    i3 = Label(w, image = icon3, width = 120, height = 120)
+    i3.place(x= 180, y = 550)
+    i4 = Label(w, image = icon4, width = 120, height = 120)
+    i4.place(x= 180, y = 730)
+    i5 = Label(w, image = icon5, width = 120, height = 120)
+    i5.place(x= 180, y = 910)
+    
+    w.mainloop()
+
+
+def button_process():  
+    global record, friend_id
+     
+    memList = record # 검색된 회원 목록
+    friend_name = board_input.get().lower()
+
+    m = 2  
+    num = len(memList)
+    if num != 0:
+        for n in range(num+1):
+            if n <= num:
+                if friend_name == memList[n][m].lower():
+                    friend_id = friend_id_select(friend_name)[0]
+                    friend_board_ui2()
+                    break
+    
+            elif n == num:
+                if friend_name == memList[n][2].lower():
+                    friend_id = friend_id_select(friend_name)[0]
+                    friend_board_ui2()
+                    break                
+                messagebox.showerror("검색 오류", "일치하는 회원이 없습니다.")
+                break
+                  
+    else:
+        messagebox.showerror("검색 오류", "일치하는 회원이 없습니다.")   
+
+def friend_list_ui():   #친구 목록 보기
+    global select_input
+    w = Toplevel()
+    w.geometry("1000x700")
+    w.title("친구 목록")
+    w.configure(bg = "white")
+ 
+    w.mainloop()
+    logo_icon = PhotoImage(file = "logo.png")
+    logo = Label(w, image = logo_icon)
+    logo.place(x = 15, y = 15)
+ 
+    button1 = Button(w, text = "내 게시판", font = ("맑은 고딕", 10), command = quit)#myBoard_ui)
+    button2 = Button(w, text = "마이페이지", font = ("맑은 고딕", 10), command = my_info_update_ui)
+    button1.place(x = 830, y = 15)
+    button2.place(x = 900, y = 15)
+    
+        
+if __name__ == '__main__':
+    mainpage_ui()
