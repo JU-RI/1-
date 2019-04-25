@@ -1,0 +1,99 @@
+import pymysql
+from board.crud import *
+
+con = None
+
+
+def myInfo(id):    # 내 정보 출력
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "select profile, name, birthday, country, city from members where id = '%s'" % id
+    cur.execute(sql)
+    record = list(cur.fetchone())
+    print(record)
+    con.commit()
+    con.close()
+    return record
+
+
+
+def wriInfo(id):  # 작성자 정보 출력
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "select profile, name from members where id = '%s'" % id
+    cur.execute(sql)
+    record = list(cur.fetchall())
+    con.commit()
+    con.close()
+    return record
+
+
+
+def insert(content_num, writer_id, content):   # 게시물 등록
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "insert into board values('%s', '%s', '%s')" % (content_num, writer_id, content)
+    cur.execute(sql)
+    print("sql문 -> 전송 성공")
+    con.commit()
+    con.close()
+
+
+
+def content_list():   # 게시물 목록 출력
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "select * from board"
+    cur.execute(sql)
+    record = list(cur.fetchall())
+    con.commit()
+    con.close()
+    return record
+
+
+
+def update(content_num, content):   # 게시물 수정
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "update board set content = '%s' where content_num = '%s'" % (content, content_num)
+    cur.execute(sql)
+    print("sql문 -> 전송 성공")
+    con.commit()
+    con.close()
+
+
+
+def delete(content_num):   # 게시물 삭제
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "delete from board where (content_num) = '%s'" % content_num
+    cur.execute(sql)
+    print("sql문 -> 전송 성공")
+    con.commit()
+    con.close()
+
+
+'''=============================================================================================='''
+
+
+def friend_list(user1_id):  #친구 목록 출력
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "select user2_id from friends where user1_id = '%s'" % user1_id
+    cur.execute(sql)
+    record = list(cur.fetchall())
+    con.commit()
+    con.close()
+    return record
+
+
+
+def friendInfo(id):    # 친구 정보 출력
+    con = connect(host = 'localhost', user = 'root', password = '1234', db = 'facebook')
+    cur = con.cursor()
+    sql = "select profile, name, birthday, country, city from members where id = '%s'" % id
+    cur.execute(sql)
+    result = list(cur.fetchall())
+    con.commit()
+    con.close()
+    return result
