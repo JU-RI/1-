@@ -1,0 +1,28 @@
+cont_num = content_num(friend_id)
+    if cont_num != []:          
+      imglist = []
+          for num in cont_num:
+              result = content_select(num[0]) # 작성자 아이디, 게시물 내용
+              writer_info = writer_info_select(result[0]) # 작성자 프로필, 이름
+
+              if writer_info[0] == "NULL" or writer_info[0] == "None": 
+                  profile_icon = "default.png"
+              else:
+                  profile_icon = writer_info[0]
+
+              imglist.append(profile_icon) 
+
+          icon1 = PhotoImage(file=imglist[0])
+          icon2 = PhotoImage(file=imglist[1])
+          icon3 = PhotoImage(file=imglist[2])
+
+          i1 = Label(w, image = icon1, width = 120, height = 120)
+          i1.place(x = 55, y = 545)
+          i2 = Label(w, image = icon2, width = 120, height = 120)
+          i2.place(x= 55, y = 750)
+          i3 = Label(w, image = icon3, width = 120, height = 120)
+          i3.place(x= 55, y = 955)
+
+
+
+
